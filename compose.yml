@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build:
+      context: .
+      target: dev
+    restart: always
+    ports:
+      - 3000:3000
+    develop:
+      watch:
+        # sync static content
+        - path: ./src
+          action: sync
+          target: /app/src
+        - path: ./public
+          action: sync
+          target: /app/public
+        - path: ./package.json
+          action: rebuild
+          target: /app/package.json
+        - path: ./pnpm-lock.yaml
+          action: rebuild
+          target: /app/pnpm-lock.yaml
