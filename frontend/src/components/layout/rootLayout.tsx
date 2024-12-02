@@ -68,7 +68,11 @@ const RootLayout: React.FC = () => {
   return (
     <Flex
       direction="column"
-      style={{ height: "100vh", backgroundColor: theme.backgroundColor }}
+      style={{
+        height: "100vh",
+        backgroundColor: theme.backgroundColor,
+        overflow: "hidden",
+      }}
     >
       <Box
         style={{
@@ -105,7 +109,7 @@ const RootLayout: React.FC = () => {
           </Switch.Thumb>
         </Switch.Root>
       </Box>
-      <Flex direction="row" style={{ flex: 1 }}>
+      <Flex direction="row" style={{ flex: 1, overflow: "hidden" }}>
         <Box
           style={{
             width: "300px",
@@ -147,6 +151,7 @@ const RootLayout: React.FC = () => {
             flex: 1,
             padding: "1rem",
             backgroundColor: "white",
+            overflowY: "auto",
           }}
         >
           <Outlet />

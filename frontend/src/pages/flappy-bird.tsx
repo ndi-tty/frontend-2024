@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./css/flappy-bird.modules.css";
 
-const GRAVITY = 1;
-const FLAP = -10;
-const PIPE_WIDTH = 50;
-const PIPE_GAP = 150;
+const PIPE_GAP = 150; // Increased gap for easier gameplay
 
 interface Bird {
   x: number;
   y: number;
   velocity: number;
+  width: number;
+  height: number;
 }
 
 interface Pipe {
@@ -18,16 +17,53 @@ interface Pipe {
 }
 
 const FlappyBird: React.FC = () => {
-  const [bird, setBird] = useState<Bird>({ x: 50, y: 300, velocity: 0 });
+  const [bird, setBird] = useState<Bird>({
+    x: 50,
+    y: 300,
+    velocity: 0,
+    width: 10,
+    height: 10,
+  });
   const [pipes, setPipes] = useState<Pipe[]>([]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [ws, setWs] = useState<WebSocket | null>(null);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (e.code === "Space") {
-      setBird((prev) => ({ ...prev, velocity: FLAP }));
-    }
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:8080");
+    setWs(socket);
+
+    socket.onmessage = (event) => {
+      const { type, data } = JSON.parse(event.data);
+
+      if (type === "INITIAL_STATE") {
+        setBird(data.bird);
+        setPipes(data.pipes);
+        setScore(data.score);
+        setGameOver(data.gameOver);
+      }
+
+      if (type === "UPDATE_STATE") {
+        setBird(data.bird);
+        setPipes(data.pipes);
+        setScore(data.score);
+        setGameOver(data.gameOver);
+      }
+    };
+
+    return () => {
+      socket.close();
+    };
   }, []);
+
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.code === "Space" && ws) {
+        ws.send(JSON.stringify({ type: "FLAP" }));
+      }
+    },
+    [ws]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
@@ -36,46 +72,13 @@ const FlappyBird: React.FC = () => {
 
   useEffect(() => {
     const gameInterval = setInterval(() => {
-      if (gameOver) return;
+      if (gameOver || !ws) return;
 
-      // Update bird position
-      setBird((prev) => ({
-        ...prev,
-        y: prev.y + prev.velocity,
-        velocity: prev.velocity + GRAVITY,
-      }));
-
-      // Add new pipes
-      setPipes((prev) => {
-        if (prev.length === 0 || prev[prev.length - 1].x < 200) {
-          const height = Math.random() * (500 - PIPE_GAP - 50) + 50;
-          return [...prev, { x: 400, height }];
-        }
-        return prev.map((pipe) => ({ ...pipe, x: pipe.x - 3 }));
-      });
-
-      // Collision detection
-      pipes.forEach((pipe) => {
-        if (
-          bird.x + 20 > pipe.x &&
-          bird.x - 20 < pipe.x + PIPE_WIDTH &&
-          (bird.y - 20 < pipe.height || bird.y + 20 > pipe.height + PIPE_GAP)
-        ) {
-          setGameOver(true);
-        }
-      });
-
-      // Check if bird hit the ground or ceiling
-      if (bird.y + 20 > 600 || bird.y - 20 < 0) {
-        setGameOver(true);
-      }
-
-      // Score update
-      setScore((prev) => prev + 1);
+      ws.send(JSON.stringify({ type: "UPDATE" }));
     }, 30);
 
     return () => clearInterval(gameInterval);
-  }, [bird, pipes, gameOver]);
+  }, [gameOver, ws]);
 
   return (
     <div className="App">
@@ -83,7 +86,12 @@ const FlappyBird: React.FC = () => {
       <div className="game-area">
         <div
           className="bird"
-          style={{ top: `${bird.y}px`, left: `${bird.x}px` }}
+          style={{
+            top: `${bird.y}px`,
+            left: `${bird.x}px`,
+            width: `${bird.width}px`,
+            height: `${bird.height}px`,
+          }}
         ></div>
         {pipes.map((pipe, index) => (
           <div key={index}>
