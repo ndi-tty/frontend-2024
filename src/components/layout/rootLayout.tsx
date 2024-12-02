@@ -1,11 +1,12 @@
 import { blackA, gray, mauve, green, slate } from "@radix-ui/colors";
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
-import { Flex, Box, Heading, Text, Card, Avatar } from "@radix-ui/themes";
+import { Flex, Box, Heading, Text, Separator } from "@radix-ui/themes";
 import * as Switch from "@radix-ui/react-switch";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import ReactLogo from "../../assets/react.svg";
 import NuitInfoLogo from "../../assets/nuit-info.svg";
+import { FaHeart } from "react-icons/fa";
 
 const themes = {
   dark: {
@@ -52,6 +53,13 @@ const getSwitchStyles = (theme: typeof themes.light | typeof themes.dark) => ({
     transition: "transform 100ms",
   },
 });
+
+const navLinkStyles = {
+  color: "inherit",
+  textDecoration: "none",
+  display: "block",
+  padding: "0.5rem",
+};
 
 const RootLayout: React.FC = () => {
   const [theme, setTheme] = React.useState(themes.light);
@@ -100,46 +108,35 @@ const RootLayout: React.FC = () => {
       <Flex direction="row" style={{ flex: 1 }}>
         <Box
           style={{
-            width: "200px",
+            width: "300px",
             padding: "1rem",
             backgroundColor: theme.navBackground,
           }}
         >
           <ul style={{ listStyle: "none", padding: 0 }}>
             <li>
-              <NavLink
-                to="/"
-                style={{
-                  color: theme.linkColor,
-                  textDecoration: "none",
-                  display: "block",
-                  padding: "0.5rem 0",
-                }}
-              >
+              <NavLink to="/" style={navLinkStyles as React.CSSProperties}>
                 Accueil
+              </NavLink>
+            </li>
+
+            <li>
+              <NavLink to="/about" style={navLinkStyles as React.CSSProperties}>
+                Monkey Island (FAQ)
               </NavLink>
             </li>
             <li>
               <NavLink
-                to="/about"
-                style={{
-                  color: theme.linkColor,
-                  textDecoration: "none",
-                  display: "block",
-                  padding: "0.5rem 0",
-                }}
+                to="/flappy-bird"
+                style={navLinkStyles as React.CSSProperties}
               >
-                Monkey Island (FAQ)
+                CAPTCHA (Flappy Bird)
               </NavLink>
-              <NavLink
-                to="/team"
-                style={{
-                  color: theme.linkColor,
-                  textDecoration: "none",
-                  display: "block",
-                  padding: "0.5rem 0",
-                }}
-              >
+            </li>
+            <Separator orientation="horizontal" size="4" />
+
+            <li>
+              <NavLink to="/team" style={navLinkStyles as React.CSSProperties}>
                 L'équipe
               </NavLink>
             </li>
@@ -167,6 +164,10 @@ const RootLayout: React.FC = () => {
               Nuit de l'info 2024
             </Heading>
           </Flex>
+          <Text as="div" style={{ color: "white", textAlign: "right" }}>
+            Made with {<FaHeart color="red" size={15} />} by{" "}
+            {<NavLink to="/team">TTY team</NavLink>}
+          </Text>
         </Flex>
       </Box>
     </Flex>

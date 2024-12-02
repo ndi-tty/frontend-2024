@@ -9,6 +9,7 @@ import ErrorPage from "./pages/error";
 import RootLayout from "./components/layout/rootLayout";
 import Home from "./pages/home";
 import Equipe from "./pages/equipe";
+import FlappyBird from "./pages/flappy-bird";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -22,6 +23,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="about" element={<div>About Page</div>} />
       <Route path="team" element={<Equipe />} />
+      <Route path="flappy-bird" element={<FlappyBird />} />
     </Route>
   )
 );
