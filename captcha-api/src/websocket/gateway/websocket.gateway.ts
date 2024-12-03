@@ -7,7 +7,9 @@ import {
   MessageBody,
   ConnectedSocket,
 } from '@nestjs/websockets';
+import { isbot } from 'isbot';
 import { Server, Socket } from 'socket.io';
+import { CaptchaService } from '../services/captcha.service';
 
 const GRAVITY = 0.5;
 const FLAP = -5;
@@ -46,9 +48,20 @@ export class WebsocketGateway
   @WebSocketServer()
   server: Server;
 
+  constructor(private readonly captchaService: CaptchaService) {}
+
   handleConnection(client: Socket) {
     console.log('Client connected');
+    const userAgent = client.handshake.headers['user-agent'];
 
+    if (isbot(userAgent)) {
+      console.log('Bot detected, connection refused');
+      client.disconnect(true);
+      return;
+    }
+
+    const sessionId = this.captchaService.createSession();
+    client.data.sessionId = sessionId;
     client.emit('INITIAL_STATE', initialState);
   }
 
@@ -58,7 +71,8 @@ export class WebsocketGateway
     @MessageBody() message: string,
   ) {
     const { type, data }: Message = JSON.parse(message);
-
+    const sessionId = client.data.sessionId;
+    console.log('Session ID:', sessionId);
     if (type === 'FLAP') {
       initialState.bird.velocity = FLAP;
     }
@@ -105,10 +119,24 @@ export class WebsocketGateway
 
       // Score update
       initialState.score += 1;
+      this.captchaService.updateScore(sessionId, initialState.score);
+
       client.emit('UPDATE_STATE', initialState);
     }
   }
 
+  // @SubscribeMessage('verifyCaptcha')
+  // handleVerifyCaptcha(
+  //   @ConnectedSocket() client: Socket,
+  //   @MessageBody() data: { sessionId: string },
+  // ) {
+  //   if (this.captchaService.verifySession(data.sessionId)) {
+  //     client.emit('CAPTCHA_VERIFIED');
+  //   } else {
+  //     client.emit('CAPTCHA_FAILED');
+  //     client.disconnect(true);
+  //   }
+  // }
   handleDisconnect(client: Socket) {
     // Reset game state
     initialState = {
@@ -118,6 +146,7 @@ export class WebsocketGateway
       gameOver: false,
     };
     client.emit('INITIAL_STATE', initialState);
+
     console.log('Client disconnected');
   }
 }

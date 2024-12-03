@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import "./css/flappy-bird.modules.css";
+import { isbot } from "isbot";
 
 const PIPE_GAP = 150; // Increased gap for easier gameplay
 
@@ -36,8 +37,14 @@ const FlappyBird: React.FC = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [isBot, setIsBot] = useState(false);
 
   useEffect(() => {
+    if (isbot(navigator.userAgent)) {
+      alert("Bot detected! Access denied.");
+      setIsBot(true);
+      return;
+    }
     const newSocket = io("http://127.0.0.1:8080");
     setSocket(newSocket);
 
@@ -84,6 +91,10 @@ const FlappyBird: React.FC = () => {
 
     return () => clearInterval(gameInterval);
   }, [gameOver, socket]);
+
+  if (isBot) {
+    return <div>Bot detected! Access denied.</div>;
+  }
 
   return (
     <div className="App">

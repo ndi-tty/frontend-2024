@@ -27,6 +27,7 @@
     "@nestjs/websockets": "^10.4.13",
     "@types/cors": "^2.8.17",
     "cors": "^2.8.5",
+    "isbot": "^5.1.17",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.1"
