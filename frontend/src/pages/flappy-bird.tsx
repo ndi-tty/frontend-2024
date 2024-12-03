@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { io, Socket } from "socket.io-client";
 import "./css/flappy-bird.modules.css";
 
 const PIPE_GAP = 150; // Increased gap for easier gameplay
@@ -16,6 +17,13 @@ interface Pipe {
   height: number;
 }
 
+interface GameState {
+  bird: Bird;
+  pipes: Pipe[];
+  score: number;
+  gameOver: boolean;
+}
+
 const FlappyBird: React.FC = () => {
   const [bird, setBird] = useState<Bird>({
     x: 50,
@@ -27,42 +35,39 @@ const FlappyBird: React.FC = () => {
   const [pipes, setPipes] = useState<Pipe[]>([]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8080");
-    setWs(socket);
+    const newSocket = io("http://127.0.0.1:8080");
+    setSocket(newSocket);
 
-    socket.onmessage = (event) => {
-      const { type, data } = JSON.parse(event.data);
+    newSocket.on("INITIAL_STATE", (initialState: GameState) => {
+      setBird(initialState.bird);
+      setPipes(initialState.pipes);
+      setScore(initialState.score);
+      setGameOver(initialState.gameOver);
+    });
 
-      if (type === "INITIAL_STATE") {
-        setBird(data.bird);
-        setPipes(data.pipes);
-        setScore(data.score);
-        setGameOver(data.gameOver);
-      }
-
-      if (type === "UPDATE_STATE") {
-        setBird(data.bird);
-        setPipes(data.pipes);
-        setScore(data.score);
-        setGameOver(data.gameOver);
-      }
-    };
+    newSocket.on("UPDATE_STATE", (updatedState: GameState) => {
+      console.log("UPDATE_STATE", updatedState);
+      setBird(updatedState.bird);
+      setPipes(updatedState.pipes);
+      setScore(updatedState.score);
+      setGameOver(updatedState.gameOver);
+    });
 
     return () => {
-      socket.close();
+      newSocket.close();
     };
   }, []);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
-      if (e.code === "Space" && ws) {
-        ws.send(JSON.stringify({ type: "FLAP" }));
+      if (e.code === "Space" && socket) {
+        socket.emit("message", JSON.stringify({ type: "FLAP" }));
       }
     },
-    [ws]
+    [socket]
   );
 
   useEffect(() => {
@@ -72,13 +77,13 @@ const FlappyBird: React.FC = () => {
 
   useEffect(() => {
     const gameInterval = setInterval(() => {
-      if (gameOver || !ws) return;
+      if (gameOver || !socket) return;
 
-      ws.send(JSON.stringify({ type: "UPDATE" }));
+      socket.emit("message", JSON.stringify({ type: "UPDATE" }));
     }, 30);
 
     return () => clearInterval(gameInterval);
-  }, [gameOver, ws]);
+  }, [gameOver, socket]);
 
   return (
     <div className="App">

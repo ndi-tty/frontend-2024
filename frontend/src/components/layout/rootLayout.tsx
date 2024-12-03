@@ -2,57 +2,18 @@ import { blackA, gray, mauve, green, slate } from "@radix-ui/colors";
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { Flex, Box, Heading, Text, Separator } from "@radix-ui/themes";
-import * as Switch from "@radix-ui/react-switch";
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import ReactLogo from "../../assets/react.svg";
 import NuitInfoLogo from "../../assets/nuit-info.svg";
 import { FaHeart } from "react-icons/fa";
 
-const themes = {
-  dark: {
-    backgroundColor: slate.slate12,
-    headerBackground: green.green9,
-    navBackground: slate.slate11,
-    color: gray.gray1,
-    linkColor: green.green5,
-    IconBackground: gray.gray1,
-  },
-  light: {
-    backgroundColor: gray.gray1,
-    headerBackground: green.green7,
-    navBackground: mauve.mauve5,
-    color: blackA.blackA12,
-    linkColor: green.green11,
-    IconBackground: blackA.blackA2,
-  },
+const theme = {
+  backgroundColor: slate.slate12,
+  headerBackground: green.green9,
+  navBackground: slate.slate11,
+  color: gray.gray1,
+  linkColor: green.green5,
+  IconBackground: gray.gray1,
 };
-
-const getSwitchStyles = (theme: typeof themes.light | typeof themes.dark) => ({
-  root: {
-    all: "unset",
-    backgroundColor: theme.linkColor,
-    borderRadius: "9999px",
-    width: "45px",
-    height: "30px",
-    position: "relative",
-    border: "none",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: theme === themes.dark ? "flex-end" : "flex-start",
-    padding: "0 2px",
-  },
-  thumb: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "24px",
-    height: "24px",
-    backgroundColor: theme.IconBackground,
-    borderRadius: "9999px",
-    transition: "transform 100ms",
-  },
-});
 
 const navLinkStyles = {
   color: "inherit",
@@ -62,9 +23,6 @@ const navLinkStyles = {
 };
 
 const RootLayout: React.FC = () => {
-  const [theme, setTheme] = React.useState(themes.light);
-  const switchStyles = getSwitchStyles(theme);
-
   return (
     <Flex
       direction="column"
@@ -93,21 +51,6 @@ const RootLayout: React.FC = () => {
             Nuit info 2024
           </Heading>
         </Flex>
-        <Switch.Root
-          checked={theme === themes.dark}
-          onCheckedChange={() =>
-            setTheme(theme === themes.light ? themes.dark : themes.light)
-          }
-          style={switchStyles.root as React.CSSProperties}
-        >
-          <Switch.Thumb style={switchStyles.thumb as React.CSSProperties}>
-            {theme === themes.dark ? (
-              <MoonIcon color={theme.headerBackground} />
-            ) : (
-              <SunIcon color={theme.headerBackground} />
-            )}
-          </Switch.Thumb>
-        </Switch.Root>
       </Box>
       <Flex direction="row" style={{ flex: 1, overflow: "hidden" }}>
         <Box

@@ -1,33 +1,69 @@
-import { WebSocketServer } from "ws";
-import { GameState, Message } from "./types";
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  MessageBody,
+  ConnectedSocket,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 
 const GRAVITY = 0.5;
 const FLAP = -5;
 const PIPE_WIDTH = 50; // Fixed width for pipes
 const PIPE_GAP = 150; // Increased gap for easier gameplay
 
-const wss = new WebSocketServer({ port: 8080 });
-
-wss.on("connection", (ws) => {
-  console.log("Client connected");
-
-  const initialState: GameState = {
-    bird: { x: 50, y: 300, velocity: 0, width: 15, height: 15 },
-    pipes: [],
-    score: 0,
-    gameOver: false,
+interface GameState {
+  bird: {
+    x: number;
+    y: number;
+    velocity: number;
+    width: number;
+    height: number;
   };
+  pipes: { x: number; height: number }[];
+  score: number;
+  gameOver: boolean;
+}
 
-  ws.send(JSON.stringify({ type: "INITIAL_STATE", data: initialState }));
+let initialState: GameState = {
+  bird: { x: 50, y: 300, velocity: 0, width: 15, height: 15 },
+  pipes: [],
+  score: 0,
+  gameOver: false,
+};
 
-  ws.on("message", (message: string) => {
+interface Message {
+  type: string;
+  data: any;
+}
+
+@WebSocketGateway({ cors: true })
+export class WebsocketGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
+  @WebSocketServer()
+  server: Server;
+
+  handleConnection(client: Socket) {
+    console.log('Client connected');
+
+    client.emit('INITIAL_STATE', initialState);
+  }
+
+  @SubscribeMessage('message')
+  handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() message: string,
+  ) {
     const { type, data }: Message = JSON.parse(message);
 
-    if (type === "FLAP") {
+    if (type === 'FLAP') {
       initialState.bird.velocity = FLAP;
     }
 
-    if (type === "UPDATE") {
+    if (type === 'UPDATE') {
       // Update bird position
       initialState.bird.y += initialState.bird.velocity;
       initialState.bird.velocity += GRAVITY;
@@ -69,12 +105,19 @@ wss.on("connection", (ws) => {
 
       // Score update
       initialState.score += 1;
-
-      ws.send(JSON.stringify({ type: "UPDATE_STATE", data: initialState }));
+      client.emit('UPDATE_STATE', initialState);
     }
-  });
+  }
 
-  ws.on("close", () => {
-    console.log("Client disconnected");
-  });
-});
+  handleDisconnect(client: Socket) {
+    // Reset game state
+    initialState = {
+      bird: { x: 50, y: 300, velocity: 0, width: 15, height: 15 },
+      pipes: [],
+      score: 0,
+      gameOver: false,
+    };
+    client.emit('INITIAL_STATE', initialState);
+    console.log('Client disconnected');
+  }
+}
