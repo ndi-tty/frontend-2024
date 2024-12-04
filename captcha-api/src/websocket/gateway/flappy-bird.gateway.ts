@@ -60,7 +60,7 @@ export class FlappyBirdGateway
         console.log('Client won the game');
         this.flappyBirdService.setCaptchValidated(client);
         client.emit('WON_GAME', { message: 'You won the game!' });
-        this.flappyBirdService.resetGameState();
+        // this.flappyBirdService.resetGameState();
       } else {
         client.emit('UPDATE_STATE', updatedState);
       }

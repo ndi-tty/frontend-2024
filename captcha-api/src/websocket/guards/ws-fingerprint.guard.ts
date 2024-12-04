@@ -26,18 +26,22 @@ export class WsFingerPrintGuard implements CanActivate {
     const userAgent = client.handshake.headers['user-agent'];
     const time = client.handshake.time;
 
+    // Check if the fingerprint exists
     let fingerprint = await this.fingerprintRepository.findOne({
       where: { ipAddress, userAgent },
     });
 
+    // Create a new fingerprint if it doesn't exist
     if (!fingerprint) {
       fingerprint = await this.createFingerprint(ipAddress, userAgent);
     }
 
+    // Reset the fingerprint if it's required
     if (this.isResetRequired(fingerprint)) {
       await this.resetFingerprint(fingerprint);
     }
 
+    // Check if the user has too many failed attempts
     if (this.isToManyAttempt(fingerprint)) {
       this.flappyBirdGateway.server.to(client.id).emit('TOO_MANY_ATTEMPTS', {
         message: 'CONNEXION REFUSED - Too many failed attempts',
