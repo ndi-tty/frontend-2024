@@ -86,6 +86,7 @@ export class FlappyBirdService {
 
     // Score update
     initialState.score += 1;
+    
 
     return initialState;
   }
@@ -115,6 +116,20 @@ export class FlappyBirdService {
     if (fingerprint) {
       fingerprint.totalFailed += 1;
       fingerprint.lastAttempt = new Date();
+      fingerprint.isFlappyBirdValidated = false;
+      await this.fingerprintRepository.save(fingerprint);
+    }
+  }
+
+  async setCaptchValidated(socket: Socket): Promise<void> {
+    const userAgent = socket.handshake.headers['user-agent'];
+    const ipAddress = socket.handshake.address;
+
+    const fingerprint = await this.fingerprintRepository.findOne({
+      where: { userAgent, ipAddress },
+    });
+    if (fingerprint) {
+      fingerprint.isFlappyBirdValidated = true;
       await this.fingerprintRepository.save(fingerprint);
     }
   }

@@ -48,6 +48,7 @@ const FlappyBird: React.FC = () => {
     null
   );
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [isWon, setIsWon] = useState(false);
 
   useEffect(() => {
     if (isbot(navigator.userAgent)) {
@@ -63,6 +64,11 @@ const FlappyBird: React.FC = () => {
       const nextAttempt = new Date(lastAttempt.getTime() + 15 * 60 * 1000); // 15 minutes later
       setNextAvailableAttempt(nextAttempt);
       setIsToManyAttempts(true);
+    });
+
+    newSocket.on("WON_GAME", () => {
+      setIsWon(true);
+      newSocket.close();
     });
 
     newSocket.on("INITIAL_STATE", (initialState: GameState) => {
@@ -144,6 +150,10 @@ const FlappyBird: React.FC = () => {
     );
   }
 
+  if (isWon) {
+    return <div>Congratulations! You won Flappy Bird!</div>;
+  }
+
   return (
     <div className="App">
       <h1>Flappy Bird with React</h1>
@@ -174,7 +184,7 @@ const FlappyBird: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="score">Score: {score}</div>
+      <div className="score">Score: {score}/ 2500</div>
       {gameOver && <div className="game-over">Game Over!</div>}
     </div>
   );

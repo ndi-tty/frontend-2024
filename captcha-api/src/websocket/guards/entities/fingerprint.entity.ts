@@ -16,4 +16,7 @@ export class CaptchaFingerPrint {
 
   @Column()
   totalFailed: number;
+
+  @Column({ default: false })
+  isFlappyBirdValidated: boolean;
 }

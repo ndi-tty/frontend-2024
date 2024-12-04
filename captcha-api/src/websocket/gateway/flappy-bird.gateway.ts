@@ -17,6 +17,8 @@ interface Message {
   data: any;
 }
 
+const WIN_SCORE = 2500;
+
 // !TODO: Add bot detection into middleware
 @WebSocketGateway({ cors: true, namespace: 'flappy-bird' })
 @UseGuards(WsFingerPrintGuard)
@@ -49,7 +51,19 @@ export class FlappyBirdGateway
         client,
         updatedState.gameOver,
       );
-      client.emit('UPDATE_STATE', updatedState);
+
+      if (updatedState.gameOver) {
+        this.flappyBirdService.resetGameState();
+      }
+
+      if (updatedState.score >= WIN_SCORE) {
+        console.log('Client won the game');
+        this.flappyBirdService.setCaptchValidated(client);
+        client.emit('WON_GAME', { message: 'You won the game!' });
+        this.flappyBirdService.resetGameState();
+      } else {
+        client.emit('UPDATE_STATE', updatedState);
+      }
     }
   }
 
