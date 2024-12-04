@@ -42,7 +42,10 @@ export class WhereIsCharlieGateway
   constructor(private readonly whereIsCharleyService: WhereIsCharlieService) {}
 
   handleConnection(client: Socket) {
-    const csvPath = join(process.cwd(), 'datasets/annotations.csv');
+    const csvPath = join(
+      process.cwd(),
+      'datasets/where-is-charlie/annotations.csv',
+    );
     const csvData = readFileSync(csvPath, 'utf8');
     const records: Annotation[] = parse(csvData, {
       columns: true,

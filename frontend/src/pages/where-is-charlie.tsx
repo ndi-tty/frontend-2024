@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import "./css/flappy-bird.modules.css";
+import "./css/where-is-charlie.modules.css";
 
 enum Events {
   CONNECTION = "connection",
@@ -28,12 +28,13 @@ const WhereIsCharlie: React.FC = () => {
   const ws = useRef<Socket | null>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [image, setImage] = useState<string | null>(null);
-  const zoomDiameter = 236; // 6 cm in pixels (assuming 96 DPI, 1 cm = ~37.8 pixels)
+  const zoomDiameter = 100; // 6 cm in pixels (assuming 96 DPI, 1 cm = ~37.8 pixels)
   const zoomRadius = zoomDiameter / 2;
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
   });
+  const [zoomEnabled, setZoomEnabled] = useState<boolean>(true); // Toggle state
 
   useEffect(() => {
     ws.current = io("http://localhost:8080/where-is-charlie");
@@ -56,8 +57,13 @@ const WhereIsCharlie: React.FC = () => {
 
     // Calculate the cursor position relative to the image
     const rect = imageRef.current.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+
+    // Clamp the position to ensure the zoom circle stays within bounds
+    x = Math.min(Math.max(x, zoomRadius), rect.width - zoomRadius);
+    y = Math.min(Math.max(y, zoomRadius), rect.height - zoomRadius);
 
     setCursorPos({ x, y });
   };
@@ -89,6 +95,9 @@ const WhereIsCharlie: React.FC = () => {
   return (
     <div className="App">
       <h1>Where Is Charlie?</h1>
+      <button onClick={() => setZoomEnabled(!zoomEnabled)}>
+        {zoomEnabled ? "Disable Zoom" : "Enable Zoom"}
+      </button>
       <div>
         {image ? (
           <div style={{ position: "relative" }}>
@@ -96,29 +105,32 @@ const WhereIsCharlie: React.FC = () => {
               ref={imageRef}
               onClick={handleClick}
               onMouseMove={handleMouseMove}
+              onDragStart={(e) => e.preventDefault()}
               src={image}
               alt="Where is Charlie?"
-              style={{ display: "block", width: "100%" }}
-            />
-            <div
               style={{
-                position: "absolute",
-                top: cursorPos.y - zoomRadius,
-                left: cursorPos.x - zoomRadius,
-                width: zoomDiameter,
-                height: zoomDiameter,
-                borderRadius: "50%",
-                border: "2px solid #fff",
-                backgroundImage: `url(${image})`,
-                backgroundPosition: `-${cursorPos.x * 2 - zoomRadius}px -${
-                  cursorPos.y * 2 - zoomRadius
-                }px`,
-                backgroundSize: `${imageRef.current?.width! * 2}px ${
-                  imageRef.current?.height! * 2
-                }px`, // Increase zoom by doubling the size
-                pointerEvents: "none", // So it doesn't block other interactions
+                display: "block",
+                width: "100%",
               }}
             />
+            {zoomEnabled && (
+              <div
+                className="zoom-circle"
+                style={{
+                  top: cursorPos.y - zoomRadius,
+                  left: cursorPos.x - zoomRadius,
+                  width: zoomDiameter,
+                  height: zoomDiameter,
+                  backgroundImage: `url(${image})`,
+                  backgroundPosition: `-${cursorPos.x * 2 - zoomRadius}px -${
+                    cursorPos.y * 2 - zoomRadius
+                  }px`,
+                  backgroundSize: `${imageRef.current?.width! * 2}px ${
+                    imageRef.current?.height! * 2
+                  }px`,
+                }}
+              />
+            )}
           </div>
         ) : (
           <p>Loading...</p>
