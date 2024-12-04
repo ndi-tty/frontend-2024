@@ -10,6 +10,7 @@ import RootLayout from "./components/layout/rootLayout";
 import Home from "./pages/home";
 import Equipe from "./pages/equipe";
 import FlappyBird from "./pages/flappy-bird";
+import WhereIsCharlie from "./pages/where-is-charlie";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
       <Route path="about" element={<div>About Page</div>} />
       <Route path="team" element={<Equipe />} />
       <Route path="flappy-bird" element={<FlappyBird />} />
+      <Route path="where-is-charlie" element={<WhereIsCharlie />} />
     </Route>
   )
 );
