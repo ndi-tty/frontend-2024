@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-<<<<<<< HEAD
 import { FlappyBirdGateway } from './gateway/flappy-bird.gateway';
 import { FlappyBirdService } from './services/flappy-bird.service';
 import { WhereIsCharlieGateway } from './gateway/where-is-charlie.gateway';
@@ -22,6 +21,12 @@ import { CaptchaFingerPrint } from './guards/entities/fingerprint.entity';
     }),
     TypeOrmModule.forFeature([CaptchaFingerPrint]),
   ],
-  providers: [FlappyBirdGateway, FlappyBirdService, WsFingerPrintGuard, WhereIsCharlieGateway, WhereIsCharlieService]
+  providers: [
+    FlappyBirdGateway,
+    FlappyBirdService,
+    WsFingerPrintGuard,
+    WhereIsCharlieGateway,
+    WhereIsCharlieService,
+  ],
 })
 export class WebsocketModule {}
