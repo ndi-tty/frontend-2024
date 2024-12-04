@@ -38,15 +38,17 @@ const FlappyBird: React.FC = () => {
   const [gameOver, setGameOver] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isBot, setIsBot] = useState(false);
-
+  const [isToManyAttempts, setIsToManyAttempts] = useState(false);
   useEffect(() => {
-    if (isbot(navigator.userAgent)) {
-      alert("Bot detected! Access denied.");
-      setIsBot(true);
-      return;
-    }
-    const newSocket = io("http://127.0.0.1:8080");
+    // !TODO: Add isBot check
+    // !TODO: Replace with your own server URL (use environment variables)
+    const newSocket = io("http://127.0.0.1:8080/flappy-bird");
     setSocket(newSocket);
+
+    newSocket.on("TOO_MANY_ATTEMPTS", (message: any) => {
+      console.log("Too many attempts : ", message);
+      setIsToManyAttempts(true);
+    });
 
     newSocket.on("INITIAL_STATE", (initialState: GameState) => {
       setBird(initialState.bird);
