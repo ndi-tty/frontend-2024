@@ -114,6 +114,7 @@ export class FlappyBirdService {
     });
     if (fingerprint) {
       fingerprint.totalFailed += 1;
+      fingerprint.lastAttempt = new Date();
       await this.fingerprintRepository.save(fingerprint);
     }
   }

@@ -25,6 +25,11 @@ interface GameState {
   gameOver: boolean;
 }
 
+interface CaptchaToManyAttempts {
+  lastAttempt: string;
+  message: string;
+}
+
 const FlappyBird: React.FC = () => {
   const [bird, setBird] = useState<Bird>({
     x: 50,
@@ -39,14 +44,24 @@ const FlappyBird: React.FC = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isBot, setIsBot] = useState(false);
   const [isToManyAttempts, setIsToManyAttempts] = useState(false);
+  const [nextAvailableAttempt, setNextAvailableAttempt] = useState<Date | null>(
+    null
+  );
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+
   useEffect(() => {
-    // !TODO: Add isBot check
-    // !TODO: Replace with your own server URL (use environment variables)
+    if (isbot(navigator.userAgent)) {
+      alert("Bot detected! Access denied.");
+      setIsBot(true);
+      return;
+    }
     const newSocket = io("http://127.0.0.1:8080/flappy-bird");
     setSocket(newSocket);
 
-    newSocket.on("TOO_MANY_ATTEMPTS", (message: any) => {
-      console.log("Too many attempts : ", message);
+    newSocket.on("TOO_MANY_ATTEMPTS", (failed: CaptchaToManyAttempts) => {
+      const lastAttempt = new Date(failed.lastAttempt);
+      const nextAttempt = new Date(lastAttempt.getTime() + 15 * 60 * 1000); // 15 minutes later
+      setNextAvailableAttempt(nextAttempt);
       setIsToManyAttempts(true);
     });
 
@@ -69,6 +84,28 @@ const FlappyBird: React.FC = () => {
       newSocket.close();
     };
   }, []);
+
+  useEffect(() => {
+    if (isToManyAttempts && nextAvailableAttempt) {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const timeDiff = nextAvailableAttempt.getTime() - now.getTime();
+        if (timeDiff <= 0) {
+          setIsToManyAttempts(false);
+          setNextAvailableAttempt(null);
+          setTimeRemaining("");
+        } else {
+          const minutes = Math.floor(
+            (timeDiff % (1000 * 60 * 60)) / (1000 * 60)
+          );
+          const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+          setTimeRemaining(`${minutes}m ${seconds}s`);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isToManyAttempts, nextAvailableAttempt]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -96,6 +133,15 @@ const FlappyBird: React.FC = () => {
 
   if (isBot) {
     return <div>Bot detected! Access denied.</div>;
+  }
+
+  if (isToManyAttempts) {
+    return (
+      <div>
+        Too many attempts. Please try again later.
+        <div>Next attempt available in: {timeRemaining}</div>
+      </div>
+    );
   }
 
   return (

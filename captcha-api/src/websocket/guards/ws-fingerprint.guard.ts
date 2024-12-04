@@ -39,10 +39,10 @@ export class WsFingerPrintGuard implements CanActivate {
     }
 
     if (this.isToManyAttempt(fingerprint)) {
-      this.flappyBirdGateway.server
-        .to(client.id)
-        .emit('TOO_MANY_ATTEMPTS', 'CONNEXION REFUSED');
-      console.error('Too many attempts');
+      this.flappyBirdGateway.server.to(client.id).emit('TOO_MANY_ATTEMPTS', {
+        message: 'CONNEXION REFUSED - Too many failed attempts',
+        lastAttempt: fingerprint.lastAttempt,
+      });
       client.disconnect(true);
       return false;
     }

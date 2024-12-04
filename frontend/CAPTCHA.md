@@ -50,11 +50,11 @@ graph TD
     A[Utilisateur accède à la page] --> B[Middleware isBot]
     B --> C[Middleware Fingerprint]
     C --> D{Empreinte connue ?}
-    D -- Non --> E[Enregistrement empreinte + Cookie]
+    D -- Non --> E[Enregistrement empreinte]
     D -- Oui --> F{Tentatives > 10 ?}
-    F -- Oui --> G[Blocage accès - 403 Forbidden]
+    F -- Oui --> G[Blocage accès - 403]
     F -- Non --> H[Challenge Captcha]
     H --> I{Captcha réussi ?}
-    I -- Non --> J[Incrémenter échecs + Nouveau Captcha]
+    I -- Non --> J[Incrémenter échecs]
     I -- Oui --> K[Accès à la ressource]
 ```
