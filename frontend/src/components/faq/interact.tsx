@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box, Flex } from "@radix-ui/themes";
 import { Popup } from "./game-popup";
+import { PromptPopup } from "./prompt-popup";
 
 interface InteractProps {
   sprite: string;
   coords: { x: number; y: number };
   popupText?: string;
   popupImage?: string; // Optional image source for the popup
+  isUsingPrompt?: boolean;
 }
 
-export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, popupImage }) => {
+export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, popupImage, isUsingPrompt }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null); // Ref for the component container
 
@@ -65,7 +67,13 @@ export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, p
           }}
         />
       </Flex>
-      {isPopupOpen && <Popup text={popupText} imageSrc={popupImage} />}
+      {isPopupOpen && (
+        isUsingPrompt ? (
+          <PromptPopup text={popupText} imageSrc={popupImage} />
+        ) : (
+          <Popup text={popupText} imageSrc={popupImage} />
+        )
+      )}
     </Box>
   );
 };

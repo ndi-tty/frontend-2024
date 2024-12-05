@@ -27,8 +27,8 @@ const FAQ: React.FC = () => {
             objectFit: "contain",
           }}
         />
-        <Interact sprite={Pirate1} coords={{x: -300, y: -100}} popupText="Hey young pirate" />
-        <Interact sprite={PirateTextSprite} coords={{x: -100, y: -120}} popupText="Captain Smirk: So you have some harder questions for me young kid ?"  popupImage={PirateTextHead}/>
+        <Interact sprite={Pirate1} coords={{x: -300, y: -100}} popupText="Hey young pirate" isUsingPrompt={false} />
+        <Interact sprite={PirateTextSprite} coords={{x: -100, y: -120}} popupText="Captain Smirk: So you have some harder questions for me young kid ?"  popupImage={PirateTextHead} isUsingPrompt={true}/>
         {/* <Interact sprite={Pirate1} coords={{x: -300, y: -100}} /> */}
       </Flex>
     </Box>
