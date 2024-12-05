@@ -1,5 +1,10 @@
 /* faq.css */
+@font-face {
+    font-family: 'pirateFont'; /*a name to be used later*/
+    src: url(../../assets/faq/font.otf); /*URL to font*/
+}
 .main {
+    font-family: 'pirateFont';
     cursor:url(https://legendofmi.com/images/downloads/icons/cursors5.gif), auto;
 }
 

@@ -9,9 +9,10 @@ interface InteractProps {
   popupText?: string;
   popupImage?: string; // Optional image source for the popup
   isUsingPrompt?: boolean;
+  size: string;
 }
 
-export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, popupImage, isUsingPrompt }) => {
+export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, popupImage, isUsingPrompt, size }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null); // Ref for the component container
 
@@ -56,7 +57,7 @@ export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, p
           src={sprite}
           alt="Sprite"
           style={{
-            width: "10vw", // Use a responsive unit for scaling
+            width: `${size}vw`, // Use a responsive unit for scaling
             maxWidth: "200px", // Cap the size
             height: "auto",
             objectFit: "contain",

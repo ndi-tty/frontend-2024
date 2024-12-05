@@ -56,7 +56,7 @@ export const PromptPopup: React.FC<PromptPopupProps> = ({ text, imageSrc }) => {
           }
         }
       }
-      setResponse((prev) => "Captain Smirk: " + prev + "\n--- Stream ended ---");
+      setResponse((prev) => prev + "\n--- Stream ended ---");
     } catch (error: any) {
       setResponse(`Request failed: ${error.message}`);
     } finally {
@@ -82,7 +82,7 @@ export const PromptPopup: React.FC<PromptPopupProps> = ({ text, imageSrc }) => {
     >
       {/* Text or Response */}
       <Box style={{ display: "flex", alignItems: "flex-start", gap: "1.5rem" }}>
-        <Box style={{ marginBottom: "7rem", fontSize: "1.2rem",  }}>
+        <Box style={{ marginBottom: "2rem", fontSize: "1.2rem", width: "80%" }}>
           {response || text}
         </Box>
 
@@ -90,23 +90,24 @@ export const PromptPopup: React.FC<PromptPopupProps> = ({ text, imageSrc }) => {
         {imageSrc && (
           <Box
             style={{
-              marginBottom: "1.5rem",
               display: "flex",
               justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
             <img
               src={imageSrc}
               alt="Popup Image"
               style={{
-                position: "absolute",
-                right: 20,
-                top: 10,
                 width: "200px",
                 height: "auto",
                 objectFit: "cover",
               }}
             />
+              <Box style={{ marginBottom: "2rem", fontSize: "1.2rem", marginTop: "10px" }}>
+              Captain Smirk
+            </Box>
           </Box>
         )}
     </Box>
@@ -142,7 +143,7 @@ export const PromptPopup: React.FC<PromptPopupProps> = ({ text, imageSrc }) => {
             cursor: isLoading ? "not-allowed" : "pointer",
           }}
         >
-          {isLoading ? "Loading..." : "Send Query"}
+          {isLoading ? "Loading..." : "Ask"}
         </button>
       </form>
     </Box>
