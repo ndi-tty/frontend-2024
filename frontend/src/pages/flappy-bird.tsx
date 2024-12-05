@@ -25,6 +25,11 @@ interface GameState {
   gameOver: boolean;
 }
 
+interface CaptchaToManyAttempts {
+  lastAttempt: string;
+  message: string;
+}
+
 const FlappyBird: React.FC = () => {
   const [bird, setBird] = useState<Bird>({
     x: 50,
@@ -38,15 +43,34 @@ const FlappyBird: React.FC = () => {
   const [gameOver, setGameOver] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isBot, setIsBot] = useState(false);
+  const [isToManyAttempts, setIsToManyAttempts] = useState(false);
+  const [nextAvailableAttempt, setNextAvailableAttempt] = useState<Date | null>(
+    null
+  );
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [isWon, setIsWon] = useState(false);
+  const [totalFailed, setTotalFailed] = useState(0);
 
   useEffect(() => {
-    if (isbot(navigator.userAgent)) {
-      alert("Bot detected! Access denied.");
-      setIsBot(true);
-      return;
-    }
-    const newSocket = io("http://127.0.0.1:8080");
+    //!TODO: Add bot detection into middleware
+    const newSocket = io("http://127.0.0.1:8080/flappy-bird");
     setSocket(newSocket);
+
+    newSocket.on("TOTAL_FAILED", (failed: number) => {
+      setTotalFailed(failed);
+    });
+
+    newSocket.on("TOO_MANY_ATTEMPTS", (failed: CaptchaToManyAttempts) => {
+      const lastAttempt = new Date(failed.lastAttempt);
+      const nextAttempt = new Date(lastAttempt.getTime() + 15 * 60 * 1000); // 15 minutes later
+      setNextAvailableAttempt(nextAttempt);
+      setIsToManyAttempts(true);
+    });
+
+    newSocket.on("WON_GAME", () => {
+      setIsWon(true);
+      newSocket.close();
+    });
 
     newSocket.on("INITIAL_STATE", (initialState: GameState) => {
       setBird(initialState.bird);
@@ -67,6 +91,32 @@ const FlappyBird: React.FC = () => {
       newSocket.close();
     };
   }, []);
+
+  useEffect(() => {
+    socket?.emit("message", JSON.stringify({ type: "FLAP" }));
+  }, [socket]);
+
+  useEffect(() => {
+    if (isToManyAttempts && nextAvailableAttempt) {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const timeDiff = nextAvailableAttempt.getTime() - now.getTime();
+        if (timeDiff <= 0) {
+          setIsToManyAttempts(false);
+          setNextAvailableAttempt(null);
+          setTimeRemaining("");
+        } else {
+          const minutes = Math.floor(
+            (timeDiff % (1000 * 60 * 60)) / (1000 * 60)
+          );
+          const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+          setTimeRemaining(`${minutes}m ${seconds}s`);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isToManyAttempts, nextAvailableAttempt]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -94,6 +144,19 @@ const FlappyBird: React.FC = () => {
 
   if (isBot) {
     return <div>Bot detected! Access denied.</div>;
+  }
+
+  if (isToManyAttempts) {
+    return (
+      <div>
+        Too many attempts. Please try again later.
+        <div>Next attempt available in: {timeRemaining}</div>
+      </div>
+    );
+  }
+
+  if (isWon) {
+    return <div>Congratulations! You won Flappy Bird!</div>;
   }
 
   return (
@@ -126,7 +189,10 @@ const FlappyBird: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="score">Score: {score}</div>
+      <div className="score">Score: {score}/2500</div>
+      <div className="total-failed">
+        Total failed attempts: {totalFailed}/10
+      </div>
       {gameOver && <div className="game-over">Game Over!</div>}
     </div>
   );

@@ -1,0 +1,92 @@
+.gameboard:hover {
+  cursor: url("https://cdn.custom-cursor.com/db/5294/32/white-cartoon-hand-cursor.png"),
+    auto;
+}
+
+.black-overlay {
+  filter: brightness(10%); /* Removes grayscale on hover for effect */
+}
+
+.highlight-square {
+  position: absolute;
+  pointer-events: none; /* Ensure it doesn't interfere with clicks */
+  border: 2px solid rgba(0, 0, 0, 0.5); /* Example for visibility */
+  /* border-radius: 50%; */
+  overflow: hidden;
+}
+
+@keyframes result-animation {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.result-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.result-animation {
+  animation: result-animation 1s ease-in-out; /* Apply the animation */
+}
+
+.timer-container {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.timer-container:hover {
+  opacity: 0.4;
+}
+
+/* Shake animation when click is wrong */
+.shake-animation {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  75% {
+    transform: translateX(-10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Attempts left text styling */
+.attempts-left {
+  position: absolute;
+  top: 10px;
+  right: 8em;
+  font-size: 1.5rem;
+  color: red;
+  z-index: 100;
+  white-space: nowrap;
+}
