@@ -1,9 +1,6 @@
-/* .zoom-circle {
-  position: absolute;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  pointer-events: none;
-} */
+.black-overlay {
+  filter: brightness(10%); /* Removes grayscale on hover for effect */
+}
 
 .highlight-square {
   position: absolute;
@@ -27,13 +24,6 @@
   }
 }
 
-.timer-container {
-  position: absolute;
-  right: 1em;
-  top: 1em;
-  z-index: 1;
-}
-
 .win-container {
   position: absolute;
   top: 50%;
@@ -46,53 +36,35 @@
   z-index: 1;
 }
 
-.game-in-progress {
-  filter: grayscale(0%); /* Removes grayscale on hover for effect */
+/* Shake animation when click is wrong */
+.shake-animation {
+  animation: shake 0.5s ease;
 }
 
-.game-win {
-  filter: grayscale(100%); /* Removes grayscale on hover for effect */
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  75% {
+    transform: translateX(-10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
-.mode-hardcore {
-  filter: grayscale(100%); /* Removes grayscale on hover for effect */
-}
-
-.timer-wrapper {
-  display: flex;
-  justify-content: center;
-}
-
-.time-wrapper {
-  position: relative;
-  width: 80px;
-  height: 60px;
-  font-size: 48px;
-  font-family: "Montserrat";
-}
-
-.time-wrapper .time {
+/* Attempts left text styling */
+.attempts-left {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform: translateY(0);
-  opacity: 1;
-  transition: all 0.2s;
-  color: #eb1f1f;
-  font-weight: 900;
-}
-
-.time-wrapper .time.up {
-  opacity: 0;
-  transform: translateY(-100%);
-}
-
-.time-wrapper .time.down {
-  opacity: 0;
-  transform: translateY(100%);
+  top: 10px;
+  left: 10px;
+  font-size: 1.5rem;
+  color: red;
+  z-index: 100;
 }

@@ -3,7 +3,8 @@ import { io, Socket } from "socket.io-client";
 import "./css/where-is-charlie.modules.css";
 import win from "../assets/win.png";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
-import CustomAlertDialog from "../components/common/customAlertDialog";
+import CustomAlertDialog from "../components/common/custom-alert-dialog";
+import Time from "../components/common/time";
 
 enum Events {
   CONNECTION = "connection",
@@ -12,60 +13,28 @@ enum Events {
   RESULT = "result",
 }
 
+enum GameState {
+  NOT_STARTED = "not-started",
+  WON = "won",
+  IN_PROGRESS = "in-progress",
+  LOST = "lost",
+}
+
 interface ConnectionPayload {
-  text: string;
+  attemptsLeft: number;
   imageBase64: string;
 }
 
 interface ResultPayload {
-  success: boolean;
+  attemptsLeft: number;
   message: string;
+  success: boolean;
 }
 
 interface Coordonates {
   x: number;
   y: number;
 }
-
-const renderTime = ({ remainingTime }: any) => {
-  const currentTime = useRef(remainingTime);
-  const prevTime = useRef(null);
-  const isNewTimeFirstTick = useRef(false);
-  const [, setOneLastRerender] = useState(0);
-
-  if (currentTime.current !== remainingTime) {
-    isNewTimeFirstTick.current = true;
-    prevTime.current = currentTime.current;
-    currentTime.current = remainingTime;
-  } else {
-    isNewTimeFirstTick.current = false;
-  }
-
-  // force one last re-render when the time is over to tirgger the last animation
-  if (remainingTime === 0) {
-    setTimeout(() => {
-      setOneLastRerender((val) => val + 1);
-    }, 20);
-  }
-
-  const isTimeUp = isNewTimeFirstTick.current;
-
-  return (
-    <div className="time-wrapper">
-      <div key={remainingTime} className={`time ${isTimeUp ? "up" : ""}`}>
-        {remainingTime}
-      </div>
-      {prevTime.current !== null && (
-        <div
-          key={prevTime.current}
-          className={`time ${!isTimeUp ? "down" : ""}`}
-        >
-          {prevTime.current}
-        </div>
-      )}
-    </div>
-  );
-};
 
 const WhereIsCharlie: React.FC = () => {
   const ws = useRef<Socket | null>(null);
@@ -76,20 +45,23 @@ const WhereIsCharlie: React.FC = () => {
     x: 0,
     y: 0,
   });
-  const [isWin, setIsWin] = useState<boolean>(false);
+  const [gameState, setGameState] = useState<GameState>(GameState.NOT_STARTED);
   const [isHardcore, setIsHardcore] = useState<boolean>(true);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null); // Track remaining attempts
+  const [isWrongClick, setIsWrongClick] = useState<boolean>(false); // Flag to trigger animation
 
   useEffect(() => {
     ws.current = io("http://localhost:8080/where-is-charlie");
     ws.current.on(Events.CONNECTION, (data: ConnectionPayload) => {
       setImage(`data:image/png;base64,${data.imageBase64}`);
+      setAttemptsLeft(data.attemptsLeft);
     });
     ws.current.on(Events.RESULT, (data: ResultPayload) => {
-      console.log(data);
-      if (data.success) {
-        setIsWin(data.success);
+      setAttemptsLeft(data.attemptsLeft);
+      if (data.success && data.attemptsLeft > 0) {
+        setGameState(GameState.WON);
       } else {
+        setIsWrongClick(true);
       }
     });
 
@@ -141,6 +113,10 @@ const WhereIsCharlie: React.FC = () => {
     }
   };
 
+  const handleAnimationEnd = () => {
+    setIsWrongClick(false); // Reset animation after it ends
+  };
+
   return (
     <div className="App">
       <h1>Where Is Charlie?</h1>
@@ -148,11 +124,11 @@ const WhereIsCharlie: React.FC = () => {
       <CustomAlertDialog
         onAction={() => {
           setIsHardcore(true);
-          setIsPlaying(true);
+          setGameState(GameState.IN_PROGRESS);
         }}
         onCancel={() => {
           setIsHardcore(false);
-          setIsPlaying(true);
+          setGameState(GameState.IN_PROGRESS);
         }}
         title="Enable Hardcore Mode?"
         description="Hardcore Mode disables the zoom feature, making the game more
@@ -162,21 +138,23 @@ const WhereIsCharlie: React.FC = () => {
       />
 
       <div style={{ position: "relative", border: "solid 2px black" }}>
-        <div className="timer-container ">
+        <div className="timer-container">
           <CountdownCircleTimer
-            isPlaying={isPlaying}
+            isPlaying={gameState === GameState.IN_PROGRESS}
             duration={180}
             colors={"#f73434"}
+            trailColor="#D9D9D9"
             onComplete={() => {
               // do your stuff here
               return { shouldRepeat: true, delay: 1.5 }; // repeat animation in 1.5 seconds
             }}
           >
-            {renderTime}
+            {Time}
           </CountdownCircleTimer>
+          <span className="attempts-left">Attempts Left: {attemptsLeft}</span>
         </div>
 
-        {isWin && (
+        {gameState === GameState.WON && (
           <div className="win-container">
             <img src={win} alt="win" />
           </div>
@@ -192,16 +170,20 @@ const WhereIsCharlie: React.FC = () => {
               src={image}
               alt="Where is Charlie?"
               className={[
-                isHardcore ? "mode-hardcore" : "",
-                isWin ? "game-win" : "game-in-progress",
+                (isHardcore && gameState === GameState.IN_PROGRESS) ||
+                gameState === GameState.WON
+                  ? "black-overlay"
+                  : "",
+                isWrongClick ? "shake-animation" : "",
               ].join(" ")}
               style={{
                 display: "block",
                 width: "100%",
               }}
+              onAnimationEnd={handleAnimationEnd} // Reset animation after it ends
             />
 
-            {isHardcore && !isWin && isPlaying && (
+            {isHardcore && gameState === GameState.IN_PROGRESS && (
               <div
                 className="highlight-square"
                 style={{
