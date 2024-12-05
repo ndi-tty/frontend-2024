@@ -2,8 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import "./css/where-is-charlie.modules.css";
 import win from "../assets/win.png";
+import lose from "../assets/lose.png";
 import CustomAlertDialog from "../components/common/custom-alert-dialog";
 import Timer from "../components/common/timer";
+import { NotificationType } from "../components/common/notification";
+import { addNotification } from "../store/slices/notifications.slice";
+import { useDispatch } from "react-redux";
 
 enum Events {
   INIT_GAME = "init-game",
@@ -25,7 +29,12 @@ interface InitGamePayload {
   gameState: GameState;
 }
 
-interface ResultPayload {
+interface ResultStartGamePayload {
+  message: string;
+  gameState: GameState;
+}
+
+interface ResultSubmitCoordonatesPayload {
   attemptsLeft: number;
   message: string;
   success: boolean;
@@ -50,10 +59,11 @@ const WhereIsCharlie: React.FC = () => {
   const [isHardcore, setIsHardcore] = useState<boolean>(true);
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null); // Track remaining attempts
   const [isWrongClick, setIsWrongClick] = useState<boolean>(false); // Flag to trigger animation
+  const dispatch = useDispatch();
 
   useEffect(() => {
     ws.current = io("http://localhost:8080/where-is-charlie");
-    ws.current.on(Events.INIT_GAME, (data: InitGamePayload) => {
+    ws.current.emit(Events.INIT_GAME, (data: InitGamePayload) => {
       setImage(`data:image/png;base64,${data.imageBase64}`);
       setAttemptsLeft(data.attemptsLeft);
       setGameState(data.gameState);
@@ -98,18 +108,15 @@ const WhereIsCharlie: React.FC = () => {
         x: x / rect.width, // Normalize to a value between 0 and 1
         y: y / rect.height, // Normalize to a value between 0 and 1
       };
-      console.log(relativeCoordinates);
 
       // Send coordinates to the backend
       ws.current?.emit(
         Events.SUBMIT_COORDONATES,
         relativeCoordinates,
-        (data: ResultPayload) => {
-          console.log(data);
-
+        (data: ResultSubmitCoordonatesPayload) => {
           setAttemptsLeft(data.attemptsLeft);
           setGameState(data.gameState);
-          setIsWrongClick(data.success);
+          setIsWrongClick(!data.success);
         }
       );
     } else {
@@ -128,36 +135,62 @@ const WhereIsCharlie: React.FC = () => {
       <CustomAlertDialog
         onAction={() => {
           setIsHardcore(true);
-          ws.current?.emit(Events.START_GAME, "hello", (data: any) => {
-            console.log(data);
-
-            setGameState(GameState.IN_PROGRESS);
-          });
+          ws.current?.emit(
+            Events.START_GAME,
+            (data: ResultStartGamePayload) => {
+              const newNotification = {
+                id: new Date().toISOString(),
+                message: data.message,
+                type: NotificationType.Info,
+              };
+              dispatch(addNotification(newNotification));
+              setGameState(data.gameState);
+            }
+          );
         }}
         onCancel={() => {
           setIsHardcore(false);
-          ws.current?.emit(Events.START_GAME, () => {
-            setGameState(GameState.IN_PROGRESS);
-          });
+          ws.current?.emit(
+            Events.START_GAME,
+            (data: ResultStartGamePayload) => {
+              const newNotification = {
+                id: new Date().toISOString(),
+                message: data.message,
+                type: NotificationType.Info,
+              };
+              dispatch(addNotification(newNotification));
+              setGameState(data.gameState);
+            }
+          );
         }}
-        title="Enable Hardcore Mode?"
-        description="Hardcore Mode disables the zoom feature, making the game more
-            challenging. Are you up for the challenge?"
+        title="Hardcore Mode?"
+        description="Hardcore Mode limits visibility to a small section of the image, making the game more challenging. Are you ready to take on the challenge?"
         actionText="Yes, Hardcore! 🔥💀🔪"
         cancelText="No, Easy Mode 😎👌👍"
       />
 
-      <div style={{ position: "relative", border: "solid 2px black" }}>
+      <div
+        className="gameboard"
+        style={{ position: "relative", border: "solid 2px black" }}
+      >
         {gameState !== GameState.NOT_STARTED && (
           <div className="timer-container">
-            <Timer isPlaying={gameState === GameState.IN_PROGRESS} />
+            <Timer
+              isPlaying={gameState === GameState.IN_PROGRESS}
+              colors={"#445bcc"}
+            />
             <span className="attempts-left">Attempts Left: {attemptsLeft}</span>
           </div>
         )}
 
         {gameState === GameState.WON && (
-          <div className="win-container">
-            <img src={win} alt="win" />
+          <div className="result-container">
+            <img className="result-animation" src={win} alt="win" />
+          </div>
+        )}
+        {gameState === GameState.LOST && (
+          <div className="result-container">
+            <img className="result-animation" src={lose} alt="lose" />
           </div>
         )}
 
@@ -172,7 +205,8 @@ const WhereIsCharlie: React.FC = () => {
               alt="Where is Charlie?"
               className={[
                 (isHardcore && gameState === GameState.IN_PROGRESS) ||
-                gameState === GameState.WON
+                gameState === GameState.WON ||
+                gameState === GameState.LOST
                   ? "black-overlay"
                   : "",
                 isWrongClick ? "shake-animation" : "",

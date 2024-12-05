@@ -9,7 +9,9 @@ import {
 import { Socket } from 'socket.io';
 import {
   Coordonate,
+  InitGamePayload,
   ResultPayload,
+  StartGamePayload,
   WhereIsCharlieService,
 } from '../services/where-is-charlie.service';
 
@@ -26,16 +28,18 @@ export class WhereIsCharlieGateway
 {
   constructor(private readonly whereIsCharleyService: WhereIsCharlieService) {}
 
-  handleConnection(client: Socket) {
-    this.whereIsCharleyService.handleInitGame(client);
+  handleConnection() {
+    console.log('Client connected');
+  }
+
+  @SubscribeMessage(Events.INIT_GAME)
+  handleInitGame(): InitGamePayload {
+    return this.whereIsCharleyService.handleInitGame();
   }
 
   @SubscribeMessage(Events.START_GAME)
-  handleStartGame(
-    @MessageBody() data: Coordonate,
-    @ConnectedSocket() client: Socket,
-  ) {
-    return this.whereIsCharleyService.handleStartGame(client);
+  handleStartGame(@ConnectedSocket() client: Socket): StartGamePayload {
+    return this.whereIsCharleyService.handleStartGame();
   }
 
   @SubscribeMessage(Events.SUBMIT_COORDONATES)
@@ -46,7 +50,7 @@ export class WhereIsCharlieGateway
     return this.whereIsCharleyService.handleCoordonates(data, client);
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect() {
     console.log('Client disconnected');
   }
 }

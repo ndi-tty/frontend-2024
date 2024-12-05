@@ -12,9 +12,14 @@ enum GameState {
   LOST = 'lost',
 }
 
-interface InitGamePayload {
+export interface InitGamePayload {
   attemptsLeft: number;
   imageBase64: string;
+  gameState: GameState;
+}
+
+export interface StartGamePayload {
+  message: string;
   gameState: GameState;
 }
 
@@ -47,7 +52,7 @@ export class WhereIsCharlieService {
   private attemptsLeft: number;
   private gameState: GameState;
 
-  handleInitGame(client: Socket) {
+  handleInitGame(): InitGamePayload {
     this.gameState = GameState.NOT_STARTED;
     this.attemptsLeft = 3;
 
@@ -75,12 +80,13 @@ export class WhereIsCharlieService {
       imageBase64,
       gameState: this.gameState,
     };
-    client.emit(Events.INIT_GAME, payload);
+
+    return payload;
   }
 
-  handleStartGame(client: Socket) {
+  handleStartGame(): StartGamePayload {
     this.gameState = GameState.IN_PROGRESS;
-    return { message: 'Game started!' };
+    return { message: 'Game started!', gameState: this.gameState };
   }
 
   handleCoordonates(data: Coordonate, client: Socket) {

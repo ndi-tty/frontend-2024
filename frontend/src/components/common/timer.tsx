@@ -1,9 +1,13 @@
 import { useRef, useState } from "react";
 import "./timer.css";
-import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import {
+  ColorFormat,
+  CountdownCircleTimer,
+} from "react-countdown-circle-timer";
 
 interface TimerProps {
   isPlaying: boolean;
+  colors: ColorFormat;
 }
 
 const renderTime = ({ remainingTime }: any) => {
@@ -46,12 +50,12 @@ const renderTime = ({ remainingTime }: any) => {
   );
 };
 
-const Timer: React.FC<TimerProps> = ({ isPlaying }) => {
+const Timer: React.FC<TimerProps> = ({ isPlaying, colors }) => {
   return (
     <CountdownCircleTimer
       isPlaying={isPlaying}
       duration={180}
-      colors={"#f73434"}
+      colors={colors}
       trailColor="#D9D9D9"
       onComplete={() => {
         // do your stuff here

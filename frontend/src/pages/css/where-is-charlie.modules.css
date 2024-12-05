@@ -1,3 +1,8 @@
+.gameboard:hover {
+  cursor: url("https://cdn.custom-cursor.com/db/5294/32/white-cartoon-hand-cursor.png"),
+    auto;
+}
+
 .black-overlay {
   filter: brightness(10%); /* Removes grayscale on hover for effect */
 }
@@ -10,7 +15,7 @@
   overflow: hidden;
 }
 
-@keyframes win-animation {
+@keyframes result-animation {
   0% {
     transform: scale(0.5);
     opacity: 0;
@@ -24,7 +29,7 @@
   }
 }
 
-.win-container {
+.result-container {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -32,16 +37,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: win-animation 1s ease-in-out; /* Apply the animation */
   z-index: 1;
+}
+
+.result-animation {
+  animation: result-animation 1s ease-in-out; /* Apply the animation */
 }
 
 .timer-container {
   position: absolute;
   right: 1em;
   top: 1em;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
   z-index: 10;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -78,8 +84,9 @@
 .attempts-left {
   position: absolute;
   top: 10px;
-  left: 10px;
+  right: 8em;
   font-size: 1.5rem;
   color: red;
   z-index: 100;
+  white-space: nowrap;
 }
