@@ -2,19 +2,34 @@ import React from "react";
 import { Box, Flex } from "@radix-ui/themes";
 import Bar from "../assets/faq/bar.png";
 import Pirate1 from "../assets/faq/pirate1.png";
+import PirateTextSprite from "../assets/faq/pirate-text-sprite.png";
+import PirateTextHead from "../assets/faq/pirate-text-head.png";
 import "./css/faq.css";
 import { Interact } from "../components/faq/interact";
 
 const FAQ: React.FC = () => {
+  
   return (
-    <Box className="main">
-      <Flex gap="4" wrap="wrap" direction="column">
+    <Box className="main" style={{ position: "relative", overflow: "hidden" }}>
+      <Flex
+        gap="4"
+        wrap="wrap"
+        direction="column"
+        style={{ position: "relative", width: "100%", height: "auto" }}
+      >
         <img
           src={Bar}
           alt="logo"
-          style={{ position: "absolute", zIndex: "1", width: "80vw", marginRight: "10px" }}
+          style={{
+            position: "relative",
+            zIndex: "0",
+            width: "100%",
+            objectFit: "contain",
+          }}
         />
-        <Interact sprite={Pirate1} />
+        <Interact sprite={Pirate1} coords={{x: -300, y: -100}} popupText="Hey young pirate" />
+        <Interact sprite={PirateTextSprite} coords={{x: -100, y: -120}} popupText="Captain Smirk: So you have some harder questions for me young kid ?"  popupImage={PirateTextHead}/>
+        {/* <Interact sprite={Pirate1} coords={{x: -300, y: -100}} /> */}
       </Flex>
     </Box>
   );
