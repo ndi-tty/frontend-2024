@@ -1,5 +1,3 @@
-import { useDispatch } from "react-redux";
-
 import { Box, Flex } from "@radix-ui/themes";
 import Back from "../../assets/game/scene1.png";
 import Pirate1 from "../../assets/faq/pirate1.png";
@@ -90,7 +88,7 @@ export default function Scene1() {
             objectFit: "contain",
           }}
         />
-        <Interact sprite={Pirate1} coords={{ x: 0, y: -280 }} popupText="Shopkeeper: Hey young pirate" size="5" title="Old man" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
+        <Interact sprite={Pirate1} coords={{ x: 0, y: -280 }} popupText="Shopkeeper: Hey yasdasdoung pirate" size="5" title="Old man" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
         <Interact sprite={Compass} coords={{ x: -900, y: -380 }} popupText="A cool looking compass, it might be useful for you later !" size="3" title="" details={[]}/>
         <Interact sprite={Wood} coords={{ x: 800, y: -480 }} popupText="Du bois c'est tout, à quoi tu t'attendais" size="3" title="" details={[]}/>
         

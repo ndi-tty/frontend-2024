@@ -35,7 +35,7 @@ export const Interact: React.FC<InteractProps> = ({
   details,
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [choiceResult, setChoiceResult] = useState<"success" | "failure" | null>(null);
+  const [_, setChoiceResult] = useState<"success" | "failure" | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
