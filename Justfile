@@ -4,3 +4,5 @@ build:
 
 deploy:
   helmfile sync -f kubernetes/helmfile.yaml
+  kubectl rollout restart deployment/frontend -n ndi-tty
+  kubectl rollout restart deployment/backend-captcha-api -n ndi-tty
