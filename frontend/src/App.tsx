@@ -9,9 +9,7 @@ import ErrorPage from "./pages/error";
 import RootLayout from "./components/layout/rootLayout";
 import Home from "./pages/home";
 import Equipe from "./pages/equipe";
-import FlappyBird from "./pages/flappy-bird";
 import FAQ from "./pages/faq";
-import WhereIsCharlie from "./pages/where-is-charlie";
 import { useEffect } from "react";
 import Scene1 from "./pages/game/Scene1";
 import Scene2 from "./pages/game/Scene2";
@@ -19,14 +17,17 @@ import Scene3 from "./pages/game/Scene3";
 import Scene4 from "./pages/game/Scene4";
 import Scene5 from "./pages/game/Scene5";
 import Scene6 from "./pages/game/Scene6";
+import CaptchaPage from "./pages/captcha";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route
       path="/"
       element={<RootLayout />}
-      //   loader={rootLoader}
-      //   action={HomeNavAction}
+      loader={() => {
+        localStorage.setItem("gameFlappyStarted", "false");
+        return null;
+      }}
       errorElement={<ErrorPage />}
     >
       <Route index element={<Home />} />
@@ -37,9 +38,25 @@ const router = createBrowserRouter(
       <Route path="scene-5" element={<Scene5 />} />
       <Route path="scene-6" element={<Scene6 />} />
       <Route path="faq" element={<FAQ />} />
-      <Route path="team" element={<Equipe />} />
-      <Route path="flappy-bird" element={<FlappyBird />} />
-      <Route path="where-is-charlie" element={<WhereIsCharlie />} />
+      <Route
+        path="about"
+        element={<div>About Page</div>}
+        loader={() => {
+          localStorage.setItem("gameFlappyStarted", "false");
+          return null;
+        }}
+      />
+
+      <Route
+        path="team"
+        element={<Equipe />}
+        loader={() => {
+          localStorage.setItem("gameFlappyStarted", "false");
+          return null;
+        }}
+      />
+
+      <Route path="captcha" element={<CaptchaPage />} />
     </Route>
   )
 );

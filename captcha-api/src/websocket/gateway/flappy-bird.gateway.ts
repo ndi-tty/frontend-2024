@@ -54,7 +54,7 @@ export class FlappyBirdGateway
 
     if (type === 'UPDATE') {
       // Check if the user won the game
-      const WIN_SCORE = 2500;
+      const WIN_SCORE = 1250;
 
       const updatedState = this.flappyBirdService.updateGameState();
 
