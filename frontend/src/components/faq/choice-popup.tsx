@@ -79,7 +79,8 @@ export const ChoicePopup: React.FC<ChoicePopupProps> = ({
     >
       {response === null ? (
         <>
-          {image !== null ? (<img src={image} alt="Question" style={{ width: "200px", height: "auto" }} />) : null}
+          {/* Conditionally render the image only if it is not null */}
+          {image && <img src={image} alt="Question" style={{ width: "200px", height: "auto" }} />}
           <p>{question}</p>
           <div
             style={{

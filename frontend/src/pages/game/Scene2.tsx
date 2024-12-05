@@ -90,7 +90,7 @@ export default function Scene2() {
             objectFit: "contain",
           }}
         />
-        <Interact sprite={Pirate8} popupImage={Pirate8Head} coords={{ x: 0, y: -280 }} popupText="Shopkeeper: Hey young pirate" size="5" title="Old man" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
+        <Interact sprite={Pirate8} popupImage={Pirate8Head} coords={{ x: 0, y: -280 }} popupText="Shopkeeper: Hey young pirate" size="5" title="Clara" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
       </Flex>
     </Box>
   );
