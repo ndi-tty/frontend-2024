@@ -43,7 +43,7 @@ export default function Scene3() {
               borderRadius: "8px",
             }}
           >
-            <p>Après de longues heures passées à marcher dans les bois tu découvre un port et décide de te cacher dans la calle d'un bateau pour y dormir un peu.</p>
+            <h1>Après de longues heures passées à marcher dans les bois tu découvre un port et décide de te cacher dans la calle d'un bateau pour y dormir un peu.</h1>
             <button
               style={{
                 marginTop: "20px",

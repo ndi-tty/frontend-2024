@@ -3,6 +3,9 @@ import { useDispatch } from "react-redux";
 import { Box, Flex } from "@radix-ui/themes";
 import Back from "../../assets/game/scene1.png";
 import Pirate1 from "../../assets/faq/pirate1.png";
+import Compass from "../../assets/game/compass.png";
+import Wood from "../../assets/game/wood.png";
+
 import "../css/faq.css";
 import { Interact } from "../../components/faq/interact";
 import { ChoicePopupProps } from "../../components/faq/choice-popup";
@@ -88,6 +91,9 @@ export default function Scene1() {
           }}
         />
         <Interact sprite={Pirate1} coords={{ x: 0, y: -280 }} popupText="Shopkeeper: Hey young pirate" size="5" title="Old man" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
+        <Interact sprite={Compass} coords={{ x: -900, y: -380 }} popupText="A cool looking compass, it might be useful for you later !" size="3" title="" details={[]}/>
+        <Interact sprite={Wood} coords={{ x: 800, y: -480 }} popupText="Du bois c'est tout, à quoi tu t'attendais" size="3" title="" details={[]}/>
+        
       </Flex>
     </Box>
   );

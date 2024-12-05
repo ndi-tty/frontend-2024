@@ -43,7 +43,7 @@ export default function Scene5() {
               borderRadius: "8px",
             }}
           >
-            <p>Après de longues heures passées à marcher dans les bois tu découvre un port et décide de te cacher dans la calle d'un bateau pour y dormir un peu.</p>
+            <h1>Une fois Bob vaincu, tu te lance sur les flots à l'aide de son navire... Toute ces nouvelles connaissances vont te permettre à ton corps de ne faire qu'un avec l'ocean. </h1>
             <button
               style={{
                 marginTop: "20px",
@@ -55,9 +55,9 @@ export default function Scene5() {
                 borderRadius: "4px",
                 cursor: "pointer",
               }}
-              onClick={() => navigate("/scene-4")} // Navigate to the first scene
+              onClick={() => navigate("/scene-6")} // Navigate to the first scene
             >
-              Dormir
+              Naviguer
             </button>
           </Box>
         </Flex>

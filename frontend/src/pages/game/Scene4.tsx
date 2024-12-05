@@ -1,6 +1,7 @@
 import { Box, Flex } from "@radix-ui/themes";
 import Back from "../../assets/game/scene3.png";
 import Pirate9 from "../../assets/faq/pirate9.png"
+import Banana from "../../assets/game/banana.png"
 import "../css/faq.css";
 import { Interact } from "../../components/faq/interact";
 import { ChoicePopupProps } from "../../components/faq/choice-popup";
@@ -48,6 +49,14 @@ export default function Scene2() {
       correctOption: 2,
     },
     {
+      question: "Les pigeons sont t ils des robots du gouvernement ?",
+      option1: "Oui ... ne le dit pas trop fort",
+      option2: "...",
+      successText: "Tu as tout compris, les pigeons sont des robots espions du gouvernement, ils sont partout, tout le temps, et ils nous surveillent !",
+      failureText: "Sois honnête, tu as déjà vu un pigeon faire quelque chose d'intelligent ?",
+      correctOption: 1,
+    },
+    {
       question: "Si l'océan était une grande rivière qui irrigue le monde, que dirais-tu des océans profonds, comme des organes internes cachés ?",
       option1: "Ce n'est pas pareil, c'est trop étrange !",
       option2: "Oui, les océans profonds sont comme des organes secrets qui régulent notre planète !",
@@ -86,6 +95,8 @@ export default function Scene2() {
           }}
         />
         <Interact sprite={Pirate9} coords={{ x: -200, y: -120 }} popupText="Bob" size="8" title="Bob" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
+        <Interact sprite={Banana} coords={{ x: 800, y: -380 }} popupText="Une bonne banane, ca fait toujours plaisir ..." size="3" title="" details={[]}/>
+      
       </Flex>
     </Box>
   );

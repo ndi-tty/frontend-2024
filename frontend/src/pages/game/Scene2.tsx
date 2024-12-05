@@ -1,6 +1,7 @@
 import { Box, Flex } from "@radix-ui/themes";
 import Back from "../../assets/game/scene2.png";
 import Pirate8 from "../../assets/faq/pirate8.png";
+import Wood from "../../assets/game/wood.png";
 import Pirate8Head from "../../assets/faq/pirate8-head.png";
 import "../css/faq.css";
 import { Interact } from "../../components/faq/interact";
@@ -51,9 +52,9 @@ export default function Scene2() {
         image: Pirate8Head,
       },
       {
-        question: "Les coraux dans l'océan sont-ils comme des cellules dans notre corps, créant une structure qui soutient tout un écosystème ?",
+        question: "Les coraux sont t ils des extraterestes ?",
         option1: "Non, ça me paraît fou !",
-        option2: "Oui, ils sont comme des cellules dans notre corps, arrgh !",
+        option2: "Oui, ils viennent de mars en réalité !",
         successText: "Arrr, tu as bien saisi ! Les coraux forment des structures vivantes qui soutiennent des milliers d'espèces, tout comme nos cellules sont essentielles pour la vie.",
         failureText: "Les coraux sont les petites cellules de l'océan, jeunes pirate, sans eux, tout l'écosystème marin s'effondrerait, tout comme ton corps sans tes cellules !",
         correctOption: 2,
@@ -91,6 +92,8 @@ export default function Scene2() {
           }}
         />
         <Interact sprite={Pirate8} popupImage={Pirate8Head} coords={{ x: 0, y: -280 }} popupText="Shopkeeper: Hey young pirate" size="5" title="Clara" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
+        <Interact sprite={Wood} coords={{ x: 800, y: -780 }} popupText="Du bois c'est tout, à quoi tu t'attendais" size="3" title="" details={[]}/>
+          
       </Flex>
     </Box>
   );

@@ -34,9 +34,9 @@ const router = createBrowserRouter(
       <Route path="scene-2" element={<Scene2 />} />
       <Route path="scene-3" element={<Scene3 />} />
       <Route path="scene-4" element={<Scene4 />} />
-      <Route path="scene-4" element={<Scene5 />} />
-      <Route path="scene-4" element={<Scene6 />} />
-      <Route path="about" element={<FAQ />} />
+      <Route path="scene-5" element={<Scene5 />} />
+      <Route path="scene-6" element={<Scene6 />} />
+      <Route path="faq" element={<FAQ />} />
       <Route path="team" element={<Equipe />} />
       <Route path="flappy-bird" element={<FlappyBird />} />
       <Route path="where-is-charlie" element={<WhereIsCharlie />} />
