@@ -1,0 +1,31 @@
+---
+releases:
+  - name: matomo
+    createNamespace: true
+    version: 9.0.0
+    chart: oci://registry-1.docker.io/bitnamicharts/matomo
+    values:
+      - values/matomo.yaml
+    namespace: matomo
+
+  - name: frontend
+    chart: frontend
+    createNamespace: true
+    namespace: ndi-tty
+    values:
+      - values/frontend.yaml
+
+  - name: backend
+    chart: captcha-api
+    createNamespace: true
+    namespace: ndi-tty
+    values:
+      - values/backend.yaml
+
+  - name: postgres
+    createNamespace: true
+    chart: oci://registry-1.docker.io/bitnamicharts/postgresql
+    version: 16.2.5
+    namespace: ndi-tty
+    values:
+      - values/postgres.yaml
