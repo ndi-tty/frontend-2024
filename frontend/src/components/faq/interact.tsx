@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Flex } from "@radix-ui/themes";
 import { Popup } from "./game-popup";
 import { PromptPopup } from "./prompt-popup";
+import { ChoicePopup, ChoicePopupProps } from "./choice-popup"; // Import the choice popup component
 import { Detail } from "../../pages/faq";
 
 interface InteractProps {
@@ -10,9 +11,13 @@ interface InteractProps {
   popupText?: string;
   popupImage?: string; // Optional image source for the popup
   isUsingPrompt?: boolean;
+  isChoicePopup?: boolean; // New prop
+  desactivateOnclick?: boolean; // New prop
+  choices?: ChoicePopupProps; // List of choices
   size: string;
   title: string;
-  details: Detail[]
+  details: Detail[];
+  onNext?: () => void;
 }
 
 export const Interact: React.FC<InteractProps> = ({
@@ -21,11 +26,17 @@ export const Interact: React.FC<InteractProps> = ({
   popupText,
   popupImage,
   isUsingPrompt,
+  isChoicePopup,
+  desactivateOnclick,
+  choices = {}, // Default to empty object
+  onNext,
   size,
   title,
-  details, // New prop
+  details,
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [choiceResult, setChoiceResult] = useState<"success" | "failure" | null>(null);
+
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -43,6 +54,17 @@ export const Interact: React.FC<InteractProps> = ({
 
   const handleImageClick = () => {
     setIsPopupOpen(true);
+  };
+
+  const handleChoiceMade = (isCorrect: boolean) => {
+    setChoiceResult(isCorrect ? "success" : "failure");
+  };
+
+  const handleNext = () => {
+    setChoiceResult(null); // Reset the choice result
+    setIsPopupOpen(false); // Close the popup
+    if (onNext) onNext(); // Notify parent if required
+    setTimeout(() => setIsPopupOpen(true), 0); // Reopen the popup immediately
   };
 
   return (
@@ -72,18 +94,27 @@ export const Interact: React.FC<InteractProps> = ({
             height: "auto",
             objectFit: "contain",
           }}
-          onClick={handleImageClick}
+          onClick={desactivateOnclick ? () => {} : handleImageClick}
           onError={(e) => {
             console.error("Error loading image:", e.target);
           }}
         />
       </Flex>
-      {isPopupOpen && (
-        isUsingPrompt ? (
-          <PromptPopup text={popupText} imageSrc={popupImage} />
-        ) : (
-          <Popup text={popupText} imageSrc={popupImage} details={details} />
-        )
+      {isPopupOpen && isChoicePopup && (
+        <ChoicePopup
+          {...choices} // Pass the current choice
+          onChoiceMade={handleChoiceMade} // Handle the response
+          onNext={handleNext} // Handle the next button click
+        />
+      )}
+      {isPopupOpen && !isChoicePopup && (
+        <>
+          {isUsingPrompt ? (
+            <PromptPopup text={popupText} imageSrc={popupImage} />
+          ) : (
+            <Popup text={popupText} imageSrc={popupImage} details={details} />
+          )}
+        </>
       )}
     </Box>
   );
