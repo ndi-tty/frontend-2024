@@ -90,7 +90,7 @@ const details: Detail[][] = [[
           }}
         />
         <Interact sprite={Pirate1} coords={{x:400, y: -240}} popupText="Shopkeeper: Hey young pirate" isUsingPrompt={false} size="5" title="Shopkeeper" details={details[0]} />
-        <Interact sprite={Monkey} coords={{x: -300, y: -570}} popupImage={MonkeyHead} popupText="Three headed Monkey: Hey young pirate" isUsingPrompt={false}  size="4"title="Three headed monkey" details={details[1]}/>
+        <Interact sprite={Monkey} coords={{x: -350, y: -200}} popupImage={MonkeyHead} popupText="Three headed Monkey: Hey young pirate" isUsingPrompt={false}  size="4"title="Three headed monkey" details={details[1]}/>
         <Interact sprite={Pirate6} popupImage={Pirate6Head} coords={{x: -320, y: -140}} popupText="Elaine Marley: Hey young pirate" isUsingPrompt={false}  size="5"title="Elaine Marley" details={details[2]}/>
         <Interact sprite={Pirate8} popupImage={Pirate8Head} coords={{x: 440, y: -130}} popupText="Elaine Marley: Hey young pirate" isUsingPrompt={false}  size="6"title="Carla" details={details[3]}/>
         <Interact sprite={PirateTextSprite} coords={{x: 30, y: -175}} popupText="Captain Smirk: So you have some harder questions for me young kid ?"  popupImage={PirateTextHead} isUsingPrompt={true}  size="7"title="Captain Smirk" details={details[4]}/>

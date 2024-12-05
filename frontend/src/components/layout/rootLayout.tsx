@@ -68,7 +68,7 @@ const RootLayout: React.FC = () => {
             </li>
 
             <li>
-              <NavLink to="/about" style={navLinkStyles as React.CSSProperties}>
+              <NavLink to="/faq" style={navLinkStyles as React.CSSProperties}>
                 Monkey Island (FAQ)
               </NavLink>
             </li>

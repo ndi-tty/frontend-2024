@@ -143,7 +143,7 @@ export const PromptPopup: React.FC<PromptPopupProps> = ({ text, imageSrc }) => {
             cursor: isLoading ? "not-allowed" : "pointer",
           }}
         >
-          {isLoading ? "Loading..." : "Ask"}
+          {isLoading ? "En cours, (on a pas de gpu soyez patient)..." : "Demander"}
         </button>
       </form>
     </Box>

@@ -1,5 +1,5 @@
 import { Box, Flex } from "@radix-ui/themes";
-import HomeBack from "../assets/game/home.png";
+import HomeBack from "../../assets/game/home.png";
 import { useNavigate } from "react-router-dom";
 
 export async function action() {}
@@ -12,7 +12,7 @@ export async function loader() {
   return { boxes, monitor };
 }
 
-export default function Home() {
+export default function Scene3() {
   const navigate = useNavigate(); // Use React Router's navigate hook
 
   return (
@@ -43,8 +43,7 @@ export default function Home() {
               borderRadius: "8px",
             }}
           >
-            <h1>Bienvenue dans le magnifique jeu Monkey Island</h1>
-            <p>Plongez dans une aventure incroyable sur une île mystérieuse. Pour en apprendre plus sur les liens entre notre bon vieil ocean et le corps humain !</p>
+            <h1>Après de longues heures passées à marcher dans les bois tu découvre un port et décide de te cacher dans la calle d'un bateau pour y dormir un peu.</h1>
             <button
               style={{
                 marginTop: "20px",
@@ -56,9 +55,9 @@ export default function Home() {
                 borderRadius: "4px",
                 cursor: "pointer",
               }}
-              onClick={() => navigate("/scene-1")} // Navigate to the first scene
+              onClick={() => navigate("/scene-4")} // Navigate to the first scene
             >
-              Start Playing
+              Dormir
             </button>
           </Box>
         </Flex>

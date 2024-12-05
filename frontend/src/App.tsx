@@ -13,6 +13,12 @@ import FlappyBird from "./pages/flappy-bird";
 import FAQ from "./pages/faq";
 import WhereIsCharlie from "./pages/where-is-charlie";
 import { useEffect } from "react";
+import Scene1 from "./pages/game/Scene1";
+import Scene2 from "./pages/game/Scene2";
+import Scene3 from "./pages/game/Scene3";
+import Scene4 from "./pages/game/Scene4";
+import Scene5 from "./pages/game/Scene5";
+import Scene6 from "./pages/game/Scene6";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,7 +30,13 @@ const router = createBrowserRouter(
       errorElement={<ErrorPage />}
     >
       <Route index element={<Home />} />
-      <Route path="about" element={<FAQ />} />
+      <Route path="scene-1" element={<Scene1 />} />
+      <Route path="scene-2" element={<Scene2 />} />
+      <Route path="scene-3" element={<Scene3 />} />
+      <Route path="scene-4" element={<Scene4 />} />
+      <Route path="scene-5" element={<Scene5 />} />
+      <Route path="scene-6" element={<Scene6 />} />
+      <Route path="faq" element={<FAQ />} />
       <Route path="team" element={<Equipe />} />
       <Route path="flappy-bird" element={<FlappyBird />} />
       <Route path="where-is-charlie" element={<WhereIsCharlie />} />
