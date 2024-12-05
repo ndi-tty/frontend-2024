@@ -14,6 +14,7 @@ import {
 } from '../services/flappy-bird.service';
 import { WsFingerPrintGuard } from '../guards/ws-fingerprint.guard';
 import { UseGuards } from '@nestjs/common';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 interface Message {
   type: string;
@@ -29,10 +30,14 @@ export class FlappyBirdGateway
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly flappyBirdService: FlappyBirdService) {}
+  constructor(
+    private readonly flappyBirdService: FlappyBirdService,
+    @InjectPinoLogger(FlappyBirdGateway.name)
+    private readonly logger: PinoLogger,
+  ) {}
 
   async handleConnection(client: Socket) {
-    console.log('Client connected to Flappy Bird game');
+    this.logger.info('client connected');
     client.emit('INITIAL_STATE', this.flappyBirdService.getInitialState());
   }
 
@@ -79,6 +84,6 @@ export class FlappyBirdGateway
     };
 
     client.emit('INITIAL_STATE', this.flappyBirdService.getInitialState());
-    console.log('Client Disconnected');
+    this.logger.info('client disconnected');
   }
 }

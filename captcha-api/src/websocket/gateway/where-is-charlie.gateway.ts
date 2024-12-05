@@ -14,6 +14,7 @@ import {
   StartGamePayload,
   WhereIsCharlieService,
 } from '../services/where-is-charlie.service';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 export enum Events {
   INIT_GAME = 'init-game',
@@ -26,10 +27,14 @@ export enum Events {
 export class WhereIsCharlieGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private readonly whereIsCharleyService: WhereIsCharlieService) {}
+  constructor(
+    private readonly whereIsCharleyService: WhereIsCharlieService,
+    @InjectPinoLogger(WhereIsCharlieGateway.name)
+    private readonly logger: PinoLogger,
+  ) {}
 
   handleConnection() {
-    console.log('Client connected');
+    this.logger.info('client connected');
   }
 
   @SubscribeMessage(Events.INIT_GAME)
@@ -51,6 +56,6 @@ export class WhereIsCharlieGateway
   }
 
   handleDisconnect() {
-    console.log('Client disconnected');
+    this.logger.info('client disconnected');
   }
 }
