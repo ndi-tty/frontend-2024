@@ -3,6 +3,7 @@ import { io, Socket } from "socket.io-client";
 import "./css/where-is-charlie.modules.css";
 import win from "../assets/win.png";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import CustomAlertDialog from "../components/common/customAlertDialog";
 
 enum Events {
   CONNECTION = "connection",
@@ -26,6 +27,46 @@ interface Coordonate {
   y: number;
 }
 
+const renderTime = ({ remainingTime }: any) => {
+  const currentTime = useRef(remainingTime);
+  const prevTime = useRef(null);
+  const isNewTimeFirstTick = useRef(false);
+  const [, setOneLastRerender] = useState(0);
+
+  if (currentTime.current !== remainingTime) {
+    isNewTimeFirstTick.current = true;
+    prevTime.current = currentTime.current;
+    currentTime.current = remainingTime;
+  } else {
+    isNewTimeFirstTick.current = false;
+  }
+
+  // force one last re-render when the time is over to tirgger the last animation
+  if (remainingTime === 0) {
+    setTimeout(() => {
+      setOneLastRerender((val) => val + 1);
+    }, 20);
+  }
+
+  const isTimeUp = isNewTimeFirstTick.current;
+
+  return (
+    <div className="time-wrapper">
+      <div key={remainingTime} className={`time ${isTimeUp ? "up" : ""}`}>
+        {remainingTime}
+      </div>
+      {prevTime.current !== null && (
+        <div
+          key={prevTime.current}
+          className={`time ${!isTimeUp ? "down" : ""}`}
+        >
+          {prevTime.current}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const WhereIsCharlie: React.FC = () => {
   const ws = useRef<Socket | null>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
@@ -39,7 +80,6 @@ const WhereIsCharlie: React.FC = () => {
   const [isWin, setIsWin] = useState<boolean>(false);
   const [isHardcore, setIsHardcore] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [showHardcoreModal, setShowHardcoreModal] = useState<boolean>(true);
 
   useEffect(() => {
     ws.current = io("http://localhost:8080/where-is-charlie");
@@ -101,139 +141,89 @@ const WhereIsCharlie: React.FC = () => {
     }
   };
 
-  const renderTime = ({ remainingTime }: any) => {
-    const currentTime = useRef(remainingTime);
-    const prevTime = useRef(null);
-    const isNewTimeFirstTick = useRef(false);
-    const [, setOneLastRerender] = useState(0);
-
-    if (currentTime.current !== remainingTime) {
-      isNewTimeFirstTick.current = true;
-      prevTime.current = currentTime.current;
-      currentTime.current = remainingTime;
-    } else {
-      isNewTimeFirstTick.current = false;
-    }
-
-    // force one last re-render when the time is over to tirgger the last animation
-    if (remainingTime === 0) {
-      setTimeout(() => {
-        setOneLastRerender((val) => val + 1);
-      }, 20);
-    }
-
-    const isTimeUp = isNewTimeFirstTick.current;
-
-    return (
-      <div className="time-wrapper">
-        <div key={remainingTime} className={`time ${isTimeUp ? "up" : ""}`}>
-          {remainingTime}
-        </div>
-        {prevTime.current !== null && (
-          <div
-            key={prevTime.current}
-            className={`time ${!isTimeUp ? "down" : ""}`}
-          >
-            {prevTime.current}
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="App">
       <h1>Where Is Charlie?</h1>
 
-      {/* Hardcore Mode Modal */}
-      {showHardcoreModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Enable Hardcore Mode?</h2>
-            <p>
-              Hardcore Mode disables the zoom feature, making the game more
-              challenging. Are you up for the challenge?
-            </p>
-            <button
-              onClick={() => {
-                setIsHardcore(true);
-                setShowHardcoreModal(false);
-                setIsPlaying(true);
-              }}
-            >
-              Yes, Hardcore!
-            </button>
-            <button
-              onClick={() => {
-                setIsHardcore(false);
-                setShowHardcoreModal(false);
-                setIsPlaying(true);
-              }}
-            >
-              No, Easy Mode
-            </button>
-          </div>
-        </div>
-      )}
-      <div style={{ position: "fixed", right: "3em", top: "3em", zIndex: 1 }}>
-        <CountdownCircleTimer
-          isPlaying={isPlaying}
-          duration={180}
-          colors={"#004777"}
-          onComplete={() => {
-            // do your stuff here
-            return { shouldRepeat: true, delay: 1.5 }; // repeat animation in 1.5 seconds
-          }}
-        >
-          {renderTime}
-        </CountdownCircleTimer>
-      </div>
-      {isWin && (
-        <div className="win-container">
-          <img src={win} alt="win" />
-        </div>
-      )}
-      {image ? (
-        <div style={{ position: "relative" }}>
-          <img
-            ref={imageRef}
-            onClick={handleClick}
-            onMouseMove={handleMouseMove}
-            onDragStart={(e) => e.preventDefault()}
-            src={image}
-            alt="Where is Charlie?"
-            className={[
-              isHardcore ? "mode-hardcore" : "",
-              isWin ? "game-win" : "game-in-progress",
-            ].join(" ")}
-            style={{
-              display: "block",
-              width: "100%",
-            }}
-          />
+      <CustomAlertDialog
+        onAction={() => {
+          setIsHardcore(true);
+          setIsPlaying(true);
+        }}
+        onCancel={() => {
+          setIsHardcore(false);
+          setIsPlaying(true);
+        }}
+        title="Enable Hardcore Mode?"
+        description="Hardcore Mode disables the zoom feature, making the game more
+            challenging. Are you up for the challenge?"
+        actionText="Yes, Hardcore! 🔥💀🔪"
+        cancelText="No, Easy Mode 😎👌👍"
+      />
 
-          {isHardcore && !isWin && (
-            <div
-              className="zoom-circle"
+      <div style={{ position: "relative", border: "solid 2px black" }}>
+        <div className="timer-container ">
+          <CountdownCircleTimer
+            isPlaying={isPlaying}
+            duration={180}
+            colors={"#f73434"}
+            onComplete={() => {
+              // do your stuff here
+              return { shouldRepeat: true, delay: 1.5 }; // repeat animation in 1.5 seconds
+            }}
+          >
+            {renderTime}
+          </CountdownCircleTimer>
+        </div>
+
+        {isWin && (
+          <div className="win-container">
+            <img src={win} alt="win" />
+          </div>
+        )}
+
+        {image ? (
+          <>
+            <img
+              ref={imageRef}
+              onClick={handleClick}
+              onMouseMove={handleMouseMove}
+              onDragStart={(e) => e.preventDefault()}
+              src={image}
+              alt="Where is Charlie?"
+              className={[
+                isHardcore ? "mode-hardcore" : "",
+                isWin ? "game-win" : "game-in-progress",
+              ].join(" ")}
               style={{
-                top: cursorPos.y - zoomRadius,
-                left: cursorPos.x - zoomRadius,
-                width: zoomDiameter,
-                height: zoomDiameter,
-                backgroundImage: `url(${image})`,
-                backgroundPosition: `-${cursorPos.x * 2 - zoomRadius}px -${
-                  cursorPos.y * 2 - zoomRadius
-                }px`,
-                backgroundSize: `${imageRef.current?.width! * 2}px ${
-                  imageRef.current?.height! * 2
-                }px`,
+                display: "block",
+                width: "100%",
               }}
             />
-          )}
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+
+            {isHardcore && !isWin && isPlaying && (
+              <div
+                className="zoom-circle"
+                style={{
+                  top: cursorPos.y - zoomRadius,
+                  left: cursorPos.x - zoomRadius,
+                  width: zoomDiameter,
+                  height: zoomDiameter,
+                  backgroundImage: `url(${image})`,
+                  backgroundPosition: `-${cursorPos.x * 2 - zoomRadius}px -${
+                    cursorPos.y * 2 - zoomRadius
+                  }px`,
+                  backgroundSize: `${imageRef.current?.width! * 2}px ${
+                    imageRef.current?.height! * 2
+                  }px`,
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
     </div>
   );
 };
