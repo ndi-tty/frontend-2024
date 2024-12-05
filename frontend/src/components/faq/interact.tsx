@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Flex } from "@radix-ui/themes";
 import { Popup } from "./game-popup";
 import { PromptPopup } from "./prompt-popup";
+import { Detail } from "../../pages/faq";
 
 interface InteractProps {
   sprite: string;
@@ -10,21 +11,30 @@ interface InteractProps {
   popupImage?: string; // Optional image source for the popup
   isUsingPrompt?: boolean;
   size: string;
+  title: string;
+  details: Detail[]
 }
 
-export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, popupImage, isUsingPrompt, size }) => {
+export const Interact: React.FC<InteractProps> = ({
+  sprite,
+  coords,
+  popupText,
+  popupImage,
+  isUsingPrompt,
+  size,
+  title,
+  details, // New prop
+}) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null); // Ref for the component container
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
-    // Close the popup if the click is outside the container
     if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
       setIsPopupOpen(false);
     }
   };
 
   useEffect(() => {
-    // Attach and clean up the click listener
     document.addEventListener("click", handleClickOutside, true);
     return () => {
       document.removeEventListener("click", handleClickOutside, true);
@@ -37,32 +47,32 @@ export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, p
 
   return (
     <Box
-      ref={containerRef} // Attach the ref to the component container
+      ref={containerRef}
       style={{ position: "relative", width: "80vw", height: "auto" }}
     >
       <Flex
         style={{
+          flexDirection: "column",
           position: "absolute",
-          top: "50%", // Center vertically relative to the container
-          left: "50%", // Center horizontally relative to the container
-          transform: `translate(${coords.x}%, ${coords.y}%)`, // Adjust positioning to the exact center
-          padding: "1rem",
+          top: "50%",
+          left: "50%",
+          transform: `translate(${coords.x}%, ${coords.y}%)`,
           alignItems: "center",
           justifyContent: "center",
-          gap: "1rem",
         }}
       >
+        <h3 style={{ color: "white" }}>{title}</h3>
         <img
           className="interact"
           src={sprite}
           alt="Sprite"
           style={{
-            width: `${size}vw`, // Use a responsive unit for scaling
-            maxWidth: "200px", // Cap the size
+            width: `${size}vw`,
+            maxWidth: "200px",
             height: "auto",
             objectFit: "contain",
           }}
-          onClick={handleImageClick} // Handle the click event to show the popup
+          onClick={handleImageClick}
           onError={(e) => {
             console.error("Error loading image:", e.target);
           }}
@@ -72,7 +82,7 @@ export const Interact: React.FC<InteractProps> = ({ sprite, coords, popupText, p
         isUsingPrompt ? (
           <PromptPopup text={popupText} imageSrc={popupImage} />
         ) : (
-          <Popup text={popupText} imageSrc={popupImage} />
+          <Popup text={popupText} imageSrc={popupImage} details={details} />
         )
       )}
     </Box>
