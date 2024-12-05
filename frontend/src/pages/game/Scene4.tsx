@@ -1,6 +1,8 @@
 import { Box, Flex } from "@radix-ui/themes";
 import Back from "../../assets/game/scene3.png";
 import Pirate9 from "../../assets/faq/pirate9.png"
+import PirateTextSprite from "../../assets/faq/pirate-text-sprite.png"
+import PirateTextHead from "../../assets/faq/pirate-text-head.png"
 import Banana from "../../assets/game/banana.png"
 import "../css/faq.css";
 import { Interact } from "../../components/faq/interact";
@@ -96,6 +98,7 @@ export default function Scene2() {
         />
         <Interact sprite={Pirate9} coords={{ x: -200, y: -120 }} popupText="Bob" size="8" title="Bob" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
         <Interact sprite={Banana} coords={{ x: 800, y: -380 }} popupText="Une bonne banane, ca fait toujours plaisir ..." size="3" title="" details={[]}/>
+        <Interact sprite={PirateTextSprite} coords={{x: 220, y: -175}} popupText="Captain Smirk: So you have some harder questions for me young kid (ce capitaine très intelligent (mistral mdr) ne te repondra qu'en anglais !!!)?"  popupImage={PirateTextHead} isUsingPrompt={true}  size="7"title="Captain Smirk" details={[]}/>
       
       </Flex>
     </Box>
