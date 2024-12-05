@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import "./css/where-is-charlie.modules.css";
+import win from "../assets/win.png";
+import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 enum Events {
   CONNECTION = "connection",
@@ -19,7 +21,7 @@ interface ResultPayload {
   message: string;
 }
 
-interface CoordonateProps {
+interface Coordonate {
   x: number;
   y: number;
 }
@@ -28,13 +30,16 @@ const WhereIsCharlie: React.FC = () => {
   const ws = useRef<Socket | null>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [image, setImage] = useState<string | null>(null);
-  const zoomDiameter = 100; // 6 cm in pixels (assuming 96 DPI, 1 cm = ~37.8 pixels)
+  const zoomDiameter = 100;
   const zoomRadius = zoomDiameter / 2;
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
   });
-  const [zoomEnabled, setZoomEnabled] = useState<boolean>(true); // Toggle state
+  const [isWin, setIsWin] = useState<boolean>(false);
+  const [isHardcore, setIsHardcore] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [showHardcoreModal, setShowHardcoreModal] = useState<boolean>(true);
 
   useEffect(() => {
     ws.current = io("http://localhost:8080/where-is-charlie");
@@ -43,6 +48,10 @@ const WhereIsCharlie: React.FC = () => {
     });
     ws.current.on(Events.RESULT, (data: ResultPayload) => {
       console.log(data);
+      if (data.success) {
+        setIsWin(data.success);
+      } else {
+      }
     });
 
     const wsCurrent = ws.current;
@@ -80,7 +89,7 @@ const WhereIsCharlie: React.FC = () => {
 
     // Ensure the coordinates are within the image
     if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-      const relativeCoordinates: CoordonateProps = {
+      const relativeCoordinates: Coordonate = {
         x: x / rect.width, // Normalize to a value between 0 and 1
         y: y / rect.height, // Normalize to a value between 0 and 1
       };
@@ -92,50 +101,139 @@ const WhereIsCharlie: React.FC = () => {
     }
   };
 
+  const renderTime = ({ remainingTime }: any) => {
+    const currentTime = useRef(remainingTime);
+    const prevTime = useRef(null);
+    const isNewTimeFirstTick = useRef(false);
+    const [, setOneLastRerender] = useState(0);
+
+    if (currentTime.current !== remainingTime) {
+      isNewTimeFirstTick.current = true;
+      prevTime.current = currentTime.current;
+      currentTime.current = remainingTime;
+    } else {
+      isNewTimeFirstTick.current = false;
+    }
+
+    // force one last re-render when the time is over to tirgger the last animation
+    if (remainingTime === 0) {
+      setTimeout(() => {
+        setOneLastRerender((val) => val + 1);
+      }, 20);
+    }
+
+    const isTimeUp = isNewTimeFirstTick.current;
+
+    return (
+      <div className="time-wrapper">
+        <div key={remainingTime} className={`time ${isTimeUp ? "up" : ""}`}>
+          {remainingTime}
+        </div>
+        {prevTime.current !== null && (
+          <div
+            key={prevTime.current}
+            className={`time ${!isTimeUp ? "down" : ""}`}
+          >
+            {prevTime.current}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="App">
       <h1>Where Is Charlie?</h1>
-      <button onClick={() => setZoomEnabled(!zoomEnabled)}>
-        {zoomEnabled ? "Disable Zoom" : "Enable Zoom"}
-      </button>
-      <div>
-        {image ? (
-          <div style={{ position: "relative" }}>
-            <img
-              ref={imageRef}
-              onClick={handleClick}
-              onMouseMove={handleMouseMove}
-              onDragStart={(e) => e.preventDefault()}
-              src={image}
-              alt="Where is Charlie?"
+
+      {/* Hardcore Mode Modal */}
+      {showHardcoreModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Enable Hardcore Mode?</h2>
+            <p>
+              Hardcore Mode disables the zoom feature, making the game more
+              challenging. Are you up for the challenge?
+            </p>
+            <button
+              onClick={() => {
+                setIsHardcore(true);
+                setShowHardcoreModal(false);
+                setIsPlaying(true);
+              }}
+            >
+              Yes, Hardcore!
+            </button>
+            <button
+              onClick={() => {
+                setIsHardcore(false);
+                setShowHardcoreModal(false);
+                setIsPlaying(true);
+              }}
+            >
+              No, Easy Mode
+            </button>
+          </div>
+        </div>
+      )}
+      <div style={{ position: "fixed", right: "3em", top: "3em", zIndex: 1 }}>
+        <CountdownCircleTimer
+          isPlaying={isPlaying}
+          duration={180}
+          colors={"#004777"}
+          onComplete={() => {
+            // do your stuff here
+            return { shouldRepeat: true, delay: 1.5 }; // repeat animation in 1.5 seconds
+          }}
+        >
+          {renderTime}
+        </CountdownCircleTimer>
+      </div>
+      {isWin && (
+        <div className="win-container">
+          <img src={win} alt="win" />
+        </div>
+      )}
+      {image ? (
+        <div style={{ position: "relative" }}>
+          <img
+            ref={imageRef}
+            onClick={handleClick}
+            onMouseMove={handleMouseMove}
+            onDragStart={(e) => e.preventDefault()}
+            src={image}
+            alt="Where is Charlie?"
+            className={[
+              isHardcore ? "mode-hardcore" : "",
+              isWin ? "game-win" : "game-in-progress",
+            ].join(" ")}
+            style={{
+              display: "block",
+              width: "100%",
+            }}
+          />
+
+          {isHardcore && !isWin && (
+            <div
+              className="zoom-circle"
               style={{
-                display: "block",
-                width: "100%",
+                top: cursorPos.y - zoomRadius,
+                left: cursorPos.x - zoomRadius,
+                width: zoomDiameter,
+                height: zoomDiameter,
+                backgroundImage: `url(${image})`,
+                backgroundPosition: `-${cursorPos.x * 2 - zoomRadius}px -${
+                  cursorPos.y * 2 - zoomRadius
+                }px`,
+                backgroundSize: `${imageRef.current?.width! * 2}px ${
+                  imageRef.current?.height! * 2
+                }px`,
               }}
             />
-            {zoomEnabled && (
-              <div
-                className="zoom-circle"
-                style={{
-                  top: cursorPos.y - zoomRadius,
-                  left: cursorPos.x - zoomRadius,
-                  width: zoomDiameter,
-                  height: zoomDiameter,
-                  backgroundImage: `url(${image})`,
-                  backgroundPosition: `-${cursorPos.x * 2 - zoomRadius}px -${
-                    cursorPos.y * 2 - zoomRadius
-                  }px`,
-                  backgroundSize: `${imageRef.current?.width! * 2}px ${
-                    imageRef.current?.height! * 2
-                  }px`,
-                }}
-              />
-            )}
-          </div>
-        ) : (
-          <p>Loading...</p>
-        )}
-      </div>
+          )}
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 };

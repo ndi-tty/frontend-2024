@@ -32,6 +32,7 @@ services:
       DATABASE_DATABASE: captcha
     volumes:
       - ./captcha-api/src:/app/src
+      - ./captcha-api/datasets:/app/datasets
     develop:
       watch:
         # sync static content

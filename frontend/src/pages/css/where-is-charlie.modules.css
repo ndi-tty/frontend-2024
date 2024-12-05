@@ -12,3 +12,112 @@
   /* border-radius: 50%; */
   overflow: hidden;
 }
+
+@keyframes win-animation {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.win-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: win-animation 1s ease-in-out; /* Apply the animation */
+  z-index: 1;
+}
+
+.game-in-progress {
+  filter: grayscale(0%); /* Removes grayscale on hover for effect */
+}
+
+.game-win {
+  filter: grayscale(100%); /* Removes grayscale on hover for effect */
+}
+
+.mode-hardcore {
+  filter: grayscale(100%); /* Removes grayscale on hover for effect */
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content button {
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-content button:hover {
+  background-color: #ddd;
+}
+
+.timer-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.time-wrapper {
+  position: relative;
+  width: 80px;
+  height: 60px;
+  font-size: 48px;
+  font-family: "Montserrat";
+}
+
+.time-wrapper .time {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 0.2s;
+}
+
+.time-wrapper .time.up {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.time-wrapper .time.down {
+  opacity: 0;
+  transform: translateY(100%);
+}
