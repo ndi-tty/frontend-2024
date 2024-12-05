@@ -1,4 +1,4 @@
-import { blackA, gray, mauve, green, slate } from "@radix-ui/colors";
+import { gray, green, slate } from "@radix-ui/colors";
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { Flex, Box, Heading, Text, Separator } from "@radix-ui/themes";

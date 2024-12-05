@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import "./css/flappy-bird.modules.css";
-import { isbot } from "isbot";
 
 const PIPE_GAP = 150; // Increased gap for easier gameplay
 
@@ -42,7 +41,7 @@ const FlappyBird: React.FC = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [isBot, setIsBot] = useState(false);
+  const [isBot] = useState(false);
   const [isToManyAttempts, setIsToManyAttempts] = useState(false);
   const [nextAvailableAttempt, setNextAvailableAttempt] = useState<Date | null>(
     null
