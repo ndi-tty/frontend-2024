@@ -5,6 +5,7 @@ import win from "../assets/win.png";
 import lose from "../assets/lose.png";
 import CustomAlertDialog from "../components/common/custom-alert-dialog";
 import Timer from "../components/common/timer";
+import { API_BASE_URL } from "../config";
 import { NotificationType } from "../components/common/notification";
 import { addNotification } from "../store/slices/notifications.slice";
 import { useDispatch } from "react-redux";
@@ -62,7 +63,7 @@ const WhereIsCharlie: React.FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    ws.current = io("http://localhost:8080/where-is-charlie");
+    ws.current = io(`${API_BASE_URL}/where-is-charlie`);
     ws.current.emit(Events.INIT_GAME, (data: InitGamePayload) => {
       setImage(`data:image/png;base64,${data.imageBase64}`);
       setAttemptsLeft(data.attemptsLeft);

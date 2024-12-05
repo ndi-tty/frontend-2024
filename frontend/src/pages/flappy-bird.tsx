@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import "./css/flappy-bird.modules.css";
+import { API_BASE_URL } from "../config";
 
 const PIPE_GAP = 150; // Increased gap for easier gameplay
 
@@ -52,7 +53,7 @@ const FlappyBird: React.FC = () => {
 
   useEffect(() => {
     //!TODO: Add bot detection into middleware
-    const newSocket = io("http://127.0.0.1:8080/flappy-bird");
+    const newSocket = io(`${API_BASE_URL}/flappy-bird`);
     setSocket(newSocket);
 
     newSocket.on("TOTAL_FAILED", (failed: number) => {
