@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import { Socket } from 'socket.io';
@@ -46,7 +45,6 @@ interface Annotation {
   ymax: string;
 }
 
-@Injectable()
 export class WhereIsCharlieService {
   private annotation: Annotation;
   private attemptsLeft: number;
