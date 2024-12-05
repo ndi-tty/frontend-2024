@@ -2,9 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { MainModule } from './main.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(MainModule);
+  const app = await NestFactory.create(MainModule, {
+    bufferLogs: true,
+  });
+  app.useLogger(app.get(Logger));
 
   const corsOptions: CorsOptions = {
     origin: '*',
