@@ -89,7 +89,7 @@ export default function Scene1() {
           }}
         />
         <Interact sprite={Pirate1} coords={{ x: 0, y: -280 }} popupText="Shopkeeper: Hey yasdasdoung pirate" size="5" title="Old man" details={[]} isChoicePopup={true} choices={choices[0][current_question]} onNext={() => {incrementQuestion()}}/>
-        <Interact sprite={Compass} coords={{ x: -900, y: -380 }} popupText="A cool looking compass, it might be useful for you later !" size="3" title="" details={[]}/>
+        <Interact sprite={Compass} coords={{ x: -900, y: -380 }} popupText="Une belle boussole elle pourait être utile plus tard !" size="3" title="" details={[]}/>
         <Interact sprite={Wood} coords={{ x: 800, y: -480 }} popupText="Du bois c'est tout, à quoi tu t'attendais" size="3" title="" details={[]}/>
         
       </Flex>
