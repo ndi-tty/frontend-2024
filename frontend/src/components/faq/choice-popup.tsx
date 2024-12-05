@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate from react
 
 export interface ChoicePopupProps {
   question?: string; // The main question text
+  image?: string; // Optional image source
   option1?: string; // Text for the first button
   option2?: string; // Text for the second button
   successText?: string; // Text to display on success
@@ -20,6 +21,7 @@ export const ChoicePopup: React.FC<ChoicePopupProps> = ({
   option2,
   successText,
   failureText,
+  image,
   correctOption,
   is_next, // Use the is_next prop
   onChoiceMade, // Callback for the result
@@ -77,6 +79,7 @@ export const ChoicePopup: React.FC<ChoicePopupProps> = ({
     >
       {response === null ? (
         <>
+          {image !== null ? (<img src={image} alt="Question" style={{ width: "200px", height: "auto" }} />) : null}
           <p>{question}</p>
           <div
             style={{

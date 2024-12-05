@@ -14,6 +14,7 @@ import FAQ from "./pages/faq";
 import WhereIsCharlie from "./pages/where-is-charlie";
 import { useEffect } from "react";
 import Scene1 from "./pages/game/Scene1";
+import Scene2 from "./pages/game/Scene2";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
     >
       <Route index element={<Home />} />
       <Route path="scene-1" element={<Scene1 />} />
+      <Route path="scene-2" element={<Scene2 />} />
       <Route path="about" element={<FAQ />} />
       <Route path="team" element={<Equipe />} />
       <Route path="flappy-bird" element={<FlappyBird />} />
