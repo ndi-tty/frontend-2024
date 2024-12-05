@@ -12,6 +12,7 @@ import Equipe from "./pages/equipe";
 import FlappyBird from "./pages/flappy-bird";
 import FAQ from "./pages/faq";
 import WhereIsCharlie from "./pages/where-is-charlie";
+import { useEffect } from "react";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,6 +33,21 @@ const router = createBrowserRouter(
 );
 
 function App() {
+  useEffect(() => {
+    // @ts-expect-error matomo
+    // eslint-disable-next-line no-var
+    var _mtm = (window._mtm = window._mtm || []);
+    _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
+
+    // eslint-disable-next-line no-var
+    var d = document,
+      g = d.createElement("script"),
+      s = d.getElementsByTagName("script")[0];
+    g.async = true;
+    g.src = "https://matomo.moreiradj.net/js/container_ZetIg1f3.js";
+    // @ts-expect-error matomo
+    s.parentNode.insertBefore(g, s);
+  }, []);
   return <RouterProvider router={router} />;
 }
 
