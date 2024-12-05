@@ -19,12 +19,10 @@ export class WsFingerPrintGuard implements CanActivate {
     @Inject(forwardRef(() => FlappyBirdGateway))
     private readonly flappyBirdGateway: FlappyBirdGateway,
   ) {}
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client: Socket = context.switchToWs().getClient<Socket>();
     const ipAddress = client.handshake.address;
     const userAgent = client.handshake.headers['user-agent'];
-    const time = client.handshake.time;
 
     // Check if the fingerprint exists
     let fingerprint = await this.fingerprintRepository.findOne({
@@ -34,6 +32,15 @@ export class WsFingerPrintGuard implements CanActivate {
     // Create a new fingerprint if it doesn't exist
     if (!fingerprint) {
       fingerprint = await this.createFingerprint(ipAddress, userAgent);
+    }
+
+    // Check if the user already won the Flappy Bird game
+    if (this.isUserAlreadyWonFlappyBird(fingerprint)) {
+      this.flappyBirdGateway.server.to(client.id).emit('WON_GAME', {
+        message: 'You already won the Flappy Bird game',
+      });
+      client.disconnect(true);
+      return false;
     }
 
     // Reset the fingerprint if it's required
@@ -79,7 +86,11 @@ export class WsFingerPrintGuard implements CanActivate {
     await this.fingerprintRepository.save(fingerprint);
   }
   private isToManyAttempt(fingerprint: CaptchaFingerPrint): boolean {
-    const MAX_ATTEMPTS = 10;
+    // !TODO: Change the MAX_ATTEMPTS to 10
+    const MAX_ATTEMPTS = 3;
     return fingerprint.totalFailed >= MAX_ATTEMPTS;
+  }
+  private isUserAlreadyWonFlappyBird(fingerprint: CaptchaFingerPrint): boolean {
+    return fingerprint.isFlappyBirdValidated;
   }
 }

@@ -22,6 +22,11 @@ interface GameState {
   gameOver: boolean;
 }
 
+export interface UserFingerPrint {
+  userAgent: string;
+  ipAddress: string;
+}
+
 let initialState: GameState = {
   bird: { x: 50, y: 300, velocity: 0, width: 15, height: 15 },
   pipes: [],
@@ -86,7 +91,6 @@ export class FlappyBirdService {
 
     // Score update
     initialState.score += 1;
-    
 
     return initialState;
   }
@@ -98,6 +102,14 @@ export class FlappyBirdService {
       score: 0,
       gameOver: false,
     };
+  }
+
+  async getUserFingerprint(user: UserFingerPrint): Promise<CaptchaFingerPrint> {
+    let fingerprint = await this.fingerprintRepository.findOne({
+      where: { userAgent: user.userAgent, ipAddress: user.ipAddress },
+    });
+
+    return fingerprint;
   }
 
   async incrementTotalFailed(

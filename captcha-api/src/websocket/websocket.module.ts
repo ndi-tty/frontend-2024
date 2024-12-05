@@ -11,11 +11,11 @@ import { CaptchaFingerPrint } from './guards/entities/fingerprint.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DATABASE_HOST,
+      host: 'localhost',
       port: 5432,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_DATABASE,
+      username: 'user',
+      password: 'password',
+      database: 'captcha',
       entities: [CaptchaFingerPrint],
       synchronize: true,
     }),
