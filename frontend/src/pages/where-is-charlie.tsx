@@ -2,9 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import "./css/where-is-charlie.modules.css";
 import win from "../assets/win.png";
-import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import CustomAlertDialog from "../components/common/custom-alert-dialog";
-import Time from "../components/common/time";
+import Timer from "../components/common/timer";
 
 enum Events {
   CONNECTION = "connection",
@@ -138,21 +137,12 @@ const WhereIsCharlie: React.FC = () => {
       />
 
       <div style={{ position: "relative", border: "solid 2px black" }}>
-        <div className="timer-container">
-          <CountdownCircleTimer
-            isPlaying={gameState === GameState.IN_PROGRESS}
-            duration={180}
-            colors={"#f73434"}
-            trailColor="#D9D9D9"
-            onComplete={() => {
-              // do your stuff here
-              return { shouldRepeat: true, delay: 1.5 }; // repeat animation in 1.5 seconds
-            }}
-          >
-            {Time}
-          </CountdownCircleTimer>
-          <span className="attempts-left">Attempts Left: {attemptsLeft}</span>
-        </div>
+        {gameState !== GameState.NOT_STARTED && (
+          <div className="timer-container">
+            <Timer isPlaying={gameState === GameState.IN_PROGRESS} />
+            <span className="attempts-left">Attempts Left: {attemptsLeft}</span>
+          </div>
+        )}
 
         {gameState === GameState.WON && (
           <div className="win-container">
@@ -160,7 +150,7 @@ const WhereIsCharlie: React.FC = () => {
           </div>
         )}
 
-        {image ? (
+        {image && gameState !== GameState.NOT_STARTED ? (
           <>
             <img
               ref={imageRef}

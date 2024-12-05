@@ -1,7 +1,12 @@
 import { useRef, useState } from "react";
-import "./time.css";
+import "./timer.css";
+import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
-const Time = ({ remainingTime }: any) => {
+interface TimerProps {
+  isPlaying: boolean;
+}
+
+const renderTime = ({ remainingTime }: any) => {
   const currentTime = useRef(remainingTime);
   const prevTime = useRef(null);
   const isNewTimeFirstTick = useRef(false);
@@ -41,4 +46,21 @@ const Time = ({ remainingTime }: any) => {
   );
 };
 
-export default Time;
+const Timer: React.FC<TimerProps> = ({ isPlaying }) => {
+  return (
+    <CountdownCircleTimer
+      isPlaying={isPlaying}
+      duration={180}
+      colors={"#f73434"}
+      trailColor="#D9D9D9"
+      onComplete={() => {
+        // do your stuff here
+        return { shouldRepeat: true, delay: 1.5 }; // repeat animation in 1.5 seconds
+      }}
+    >
+      {renderTime}
+    </CountdownCircleTimer>
+  );
+};
+
+export default Timer;

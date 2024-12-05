@@ -36,6 +36,21 @@
   z-index: 1;
 }
 
+.timer-container {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.timer-container:hover {
+  opacity: 0.4;
+}
+
 /* Shake animation when click is wrong */
 .shake-animation {
   animation: shake 0.5s ease;
