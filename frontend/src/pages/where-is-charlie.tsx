@@ -6,10 +6,10 @@ import CustomAlertDialog from "../components/common/custom-alert-dialog";
 import Timer from "../components/common/timer";
 
 enum Events {
-  CONNECTION = "connection",
-  COORDONATE = "coordonate",
+  INIT_GAME = "init-game",
+  START_GAME = "start-game",
   ERROR = "error",
-  RESULT = "result",
+  SUBMIT_COORDONATES = "submit-coordonates",
 }
 
 enum GameState {
@@ -19,15 +19,17 @@ enum GameState {
   LOST = "lost",
 }
 
-interface ConnectionPayload {
+interface InitGamePayload {
   attemptsLeft: number;
   imageBase64: string;
+  gameState: GameState;
 }
 
 interface ResultPayload {
   attemptsLeft: number;
   message: string;
   success: boolean;
+  gameState: GameState;
 }
 
 interface Coordonates {
@@ -44,24 +46,17 @@ const WhereIsCharlie: React.FC = () => {
     x: 0,
     y: 0,
   });
-  const [gameState, setGameState] = useState<GameState>(GameState.NOT_STARTED);
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [isHardcore, setIsHardcore] = useState<boolean>(true);
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null); // Track remaining attempts
   const [isWrongClick, setIsWrongClick] = useState<boolean>(false); // Flag to trigger animation
 
   useEffect(() => {
     ws.current = io("http://localhost:8080/where-is-charlie");
-    ws.current.on(Events.CONNECTION, (data: ConnectionPayload) => {
+    ws.current.on(Events.INIT_GAME, (data: InitGamePayload) => {
       setImage(`data:image/png;base64,${data.imageBase64}`);
       setAttemptsLeft(data.attemptsLeft);
-    });
-    ws.current.on(Events.RESULT, (data: ResultPayload) => {
-      setAttemptsLeft(data.attemptsLeft);
-      if (data.success && data.attemptsLeft > 0) {
-        setGameState(GameState.WON);
-      } else {
-        setIsWrongClick(true);
-      }
+      setGameState(data.gameState);
     });
 
     const wsCurrent = ws.current;
@@ -106,7 +101,17 @@ const WhereIsCharlie: React.FC = () => {
       console.log(relativeCoordinates);
 
       // Send coordinates to the backend
-      ws.current?.emit(Events.COORDONATE, relativeCoordinates);
+      ws.current?.emit(
+        Events.SUBMIT_COORDONATES,
+        relativeCoordinates,
+        (data: ResultPayload) => {
+          console.log(data);
+
+          setAttemptsLeft(data.attemptsLeft);
+          setGameState(data.gameState);
+          setIsWrongClick(data.success);
+        }
+      );
     } else {
       console.log("Click was outside the image.");
     }
@@ -123,11 +128,17 @@ const WhereIsCharlie: React.FC = () => {
       <CustomAlertDialog
         onAction={() => {
           setIsHardcore(true);
-          setGameState(GameState.IN_PROGRESS);
+          ws.current?.emit(Events.START_GAME, "hello", (data: any) => {
+            console.log(data);
+
+            setGameState(GameState.IN_PROGRESS);
+          });
         }}
         onCancel={() => {
           setIsHardcore(false);
-          setGameState(GameState.IN_PROGRESS);
+          ws.current?.emit(Events.START_GAME, () => {
+            setGameState(GameState.IN_PROGRESS);
+          });
         }}
         title="Enable Hardcore Mode?"
         description="Hardcore Mode disables the zoom feature, making the game more

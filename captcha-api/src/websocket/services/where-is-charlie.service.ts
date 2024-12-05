@@ -3,16 +3,26 @@ import { join } from 'path';
 import { readFileSync } from 'fs';
 import { Socket } from 'socket.io';
 import { parse } from 'csv-parse/sync';
+import { Events } from '../gateway/where-is-charlie.gateway';
 
-interface ConnectionPayload {
-  attemptsLeft: number;
-  imageBase64: string;
+enum GameState {
+  NOT_STARTED = 'not-started',
+  WON = 'won',
+  IN_PROGRESS = 'in-progress',
+  LOST = 'lost',
 }
 
-interface ResultPayload {
+interface InitGamePayload {
+  attemptsLeft: number;
+  imageBase64: string;
+  gameState: GameState;
+}
+
+export interface ResultPayload {
   attemptsLeft: number;
   message: string;
   success: boolean;
+  gameState: GameState;
 }
 
 export interface Coordonate {
@@ -33,10 +43,12 @@ interface Annotation {
 
 @Injectable()
 export class WhereIsCharlieService {
-  private currentAnnotation: Annotation;
+  private annotation: Annotation;
   private attemptsLeft: number;
+  private gameState: GameState;
 
   handleInitGame(client: Socket) {
+    this.gameState = GameState.NOT_STARTED;
     this.attemptsLeft = 3;
 
     const csvPath = join(
@@ -48,34 +60,39 @@ export class WhereIsCharlieService {
       columns: true,
       skip_empty_lines: true,
     });
-
     const randomIndex = Math.floor(Math.random() * records.length);
-    this.currentAnnotation = records[randomIndex];
+    this.annotation = records[randomIndex];
 
     const imagePath = join(
       process.cwd(),
       'datasets/where-is-charlie',
-      this.currentAnnotation.filename,
+      this.annotation.filename,
     );
-    const imageData = readFileSync(imagePath);
+    const imageBase64 = readFileSync(imagePath).toString('base64');
 
-    const payload: ConnectionPayload = {
+    const payload: InitGamePayload = {
       attemptsLeft: this.attemptsLeft,
-      imageBase64: imageData.toString('base64'),
+      imageBase64,
+      gameState: this.gameState,
     };
-    client.emit('connection', payload);
+    client.emit(Events.INIT_GAME, payload);
+  }
+
+  handleStartGame(client: Socket) {
+    this.gameState = GameState.IN_PROGRESS;
+    return { message: 'Game started!' };
   }
 
   handleCoordonates(data: Coordonate, client: Socket) {
-    if (!this.currentAnnotation) {
-      client.emit('error', { message: 'No active game session!' });
+    if (!this.annotation || this.gameState !== GameState.IN_PROGRESS) {
+      client.emit(Events.ERROR, { message: 'No active game session!' });
       return;
     }
 
     const { x, y } = data;
 
     // Normalize the bounding box from the annotation
-    const { xmin, ymin, xmax, ymax, width, height } = this.currentAnnotation;
+    const { xmin, ymin, xmax, ymax, width, height } = this.annotation;
 
     const normalizedBox = {
       xmin: parseFloat(xmin) / parseFloat(width),
@@ -91,20 +108,26 @@ export class WhereIsCharlieService {
       y >= normalizedBox.ymin &&
       y <= normalizedBox.ymax
     ) {
+      this.gameState = GameState.WON;
       const result: ResultPayload = {
         attemptsLeft: this.attemptsLeft,
         message: 'You found Charlie!',
         success: true,
+        gameState: this.gameState,
       };
-      client.emit('result', result);
+      return result;
     } else {
       this.attemptsLeft--;
+      if (this.attemptsLeft < 1) {
+        this.gameState = GameState.LOST;
+      }
       const result: ResultPayload = {
         attemptsLeft: this.attemptsLeft,
         message: 'Try again!',
         success: false,
+        gameState: this.gameState,
       };
-      client.emit('result', result);
+      return result;
     }
   }
 }

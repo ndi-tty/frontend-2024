@@ -9,8 +9,16 @@ import {
 import { Socket } from 'socket.io';
 import {
   Coordonate,
+  ResultPayload,
   WhereIsCharlieService,
 } from '../services/where-is-charlie.service';
+
+export enum Events {
+  INIT_GAME = 'init-game',
+  START_GAME = 'start-game',
+  ERROR = 'error',
+  SUBMIT_COORDONATES = 'submit-coordonates',
+}
 
 @WebSocketGateway({ cors: true, namespace: 'where-is-charlie' })
 export class WhereIsCharlieGateway
@@ -22,12 +30,20 @@ export class WhereIsCharlieGateway
     this.whereIsCharleyService.handleInitGame(client);
   }
 
-  @SubscribeMessage('coordonate')
-  handleCoordonate(
+  @SubscribeMessage(Events.START_GAME)
+  handleStartGame(
     @MessageBody() data: Coordonate,
     @ConnectedSocket() client: Socket,
   ) {
-    this.whereIsCharleyService.handleCoordonates(data, client);
+    return this.whereIsCharleyService.handleStartGame(client);
+  }
+
+  @SubscribeMessage(Events.SUBMIT_COORDONATES)
+  handleCoordonates(
+    @MessageBody() data: Coordonate,
+    @ConnectedSocket() client: Socket,
+  ): ResultPayload {
+    return this.whereIsCharleyService.handleCoordonates(data, client);
   }
 
   handleDisconnect(client: Socket) {
