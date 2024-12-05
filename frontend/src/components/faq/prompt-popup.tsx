@@ -16,7 +16,7 @@ export const PromptPopup: React.FC<PromptPopupProps> = ({ text, imageSrc }) => {
     setResponse("");
     setIsLoading(true);
 
-    const url = "http://127.0.0.1:11434/api/generate"; // Adjust the URL if needed
+    const url = "https://ollama.moreiradj.net/api/generate"; // Adjust the URL if needed
 
     const payload = {
       model: "mistral:latest",
