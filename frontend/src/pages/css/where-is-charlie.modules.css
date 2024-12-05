@@ -5,7 +5,7 @@
   pointer-events: none;
 } */
 
-.zoom-circle {
+.highlight-square {
   position: absolute;
   pointer-events: none; /* Ensure it doesn't interfere with clicks */
   border: 2px solid rgba(0, 0, 0, 0.5); /* Example for visibility */

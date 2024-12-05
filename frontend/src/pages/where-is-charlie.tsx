@@ -22,7 +22,7 @@ interface ResultPayload {
   message: string;
 }
 
-interface Coordonate {
+interface Coordonates {
   x: number;
   y: number;
 }
@@ -71,8 +71,7 @@ const WhereIsCharlie: React.FC = () => {
   const ws = useRef<Socket | null>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [image, setImage] = useState<string | null>(null);
-  const zoomDiameter = 100;
-  const zoomRadius = zoomDiameter / 2;
+  const squareLength = 500;
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -111,8 +110,8 @@ const WhereIsCharlie: React.FC = () => {
     let y = event.clientY - rect.top;
 
     // Clamp the position to ensure the zoom circle stays within bounds
-    x = Math.min(Math.max(x, zoomRadius), rect.width - zoomRadius);
-    y = Math.min(Math.max(y, zoomRadius), rect.height - zoomRadius);
+    x = Math.min(Math.max(x, squareLength / 2), rect.width - squareLength / 2);
+    y = Math.min(Math.max(y, squareLength / 2), rect.height - squareLength / 2);
 
     setCursorPos({ x, y });
   };
@@ -129,10 +128,11 @@ const WhereIsCharlie: React.FC = () => {
 
     // Ensure the coordinates are within the image
     if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-      const relativeCoordinates: Coordonate = {
+      const relativeCoordinates: Coordonates = {
         x: x / rect.width, // Normalize to a value between 0 and 1
         y: y / rect.height, // Normalize to a value between 0 and 1
       };
+      console.log(relativeCoordinates);
 
       // Send coordinates to the backend
       ws.current?.emit(Events.COORDONATE, relativeCoordinates);
@@ -203,19 +203,19 @@ const WhereIsCharlie: React.FC = () => {
 
             {isHardcore && !isWin && isPlaying && (
               <div
-                className="zoom-circle"
+                className="highlight-square"
                 style={{
-                  top: cursorPos.y - zoomRadius,
-                  left: cursorPos.x - zoomRadius,
-                  width: zoomDiameter,
-                  height: zoomDiameter,
+                  top: cursorPos.y - squareLength / 2,
+                  left: cursorPos.x - squareLength / 2,
+                  width: squareLength,
+                  height: squareLength,
                   backgroundImage: `url(${image})`,
-                  backgroundPosition: `-${cursorPos.x * 2 - zoomRadius}px -${
-                    cursorPos.y * 2 - zoomRadius
-                  }px`,
-                  backgroundSize: `${imageRef.current?.width! * 2}px ${
-                    imageRef.current?.height! * 2
-                  }px`,
+                  backgroundPosition: `-${
+                    2 + cursorPos.x - squareLength / 2
+                  }px -${2 + cursorPos.y - squareLength / 2}px`,
+                  // backgroundSize: `${imageRef.current?.width!}px ${imageRef
+                  //   .current?.height!}px`,
+                  backgroundSize: `${imageRef.current?.offsetWidth}px ${imageRef.current?.offsetHeight}px`,
                 }}
               />
             )}
