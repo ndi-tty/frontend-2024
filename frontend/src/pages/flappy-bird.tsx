@@ -49,15 +49,16 @@ const FlappyBird: React.FC = () => {
   );
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [isWon, setIsWon] = useState(false);
+  const [totalFailed, setTotalFailed] = useState(0);
 
   useEffect(() => {
-    if (isbot(navigator.userAgent)) {
-      alert("Bot detected! Access denied.");
-      setIsBot(true);
-      return;
-    }
+    //!TODO: Add bot detection into middleware
     const newSocket = io("http://127.0.0.1:8080/flappy-bird");
     setSocket(newSocket);
+
+    newSocket.on("TOTAL_FAILED", (failed: number) => {
+      setTotalFailed(failed);
+    });
 
     newSocket.on("TOO_MANY_ATTEMPTS", (failed: CaptchaToManyAttempts) => {
       const lastAttempt = new Date(failed.lastAttempt);
@@ -90,6 +91,10 @@ const FlappyBird: React.FC = () => {
       newSocket.close();
     };
   }, []);
+
+  useEffect(() => {
+    socket?.emit("message", JSON.stringify({ type: "FLAP" }));
+  }, [socket]);
 
   useEffect(() => {
     if (isToManyAttempts && nextAvailableAttempt) {
@@ -184,7 +189,10 @@ const FlappyBird: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="score">Score: {score}/ 2500</div>
+      <div className="score">Score: {score}/2500</div>
+      <div className="total-failed">
+        Total failed attempts: {totalFailed}/10
+      </div>
       {gameOver && <div className="game-over">Game Over!</div>}
     </div>
   );

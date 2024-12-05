@@ -20,8 +20,6 @@ interface Message {
   data: any;
 }
 
-const WIN_SCORE = 2500;
-
 // !TODO: Add bot detection into middleware
 @WebSocketGateway({ cors: true, namespace: 'flappy-bird' })
 @UseGuards(WsFingerPrintGuard)
@@ -44,11 +42,15 @@ export class FlappyBirdGateway
     @MessageBody() message: string,
   ) {
     const { type, data }: Message = JSON.parse(message);
+
     if (type === 'FLAP') {
       this.flappyBirdService.flapBird();
     }
 
     if (type === 'UPDATE') {
+      // Check if the user won the game
+      const WIN_SCORE = 2500;
+
       const updatedState = this.flappyBirdService.updateGameState();
 
       if (updatedState.gameOver) {
@@ -71,6 +73,11 @@ export class FlappyBirdGateway
 
   handleDisconnect(client: Socket) {
     this.flappyBirdService.resetGameState();
+    const userFingerprint: UserFingerPrint = {
+      userAgent: client.handshake.headers['user-agent'],
+      ipAddress: client.handshake.address,
+    };
+
     client.emit('INITIAL_STATE', this.flappyBirdService.getInitialState());
     console.log('Client Disconnected');
   }

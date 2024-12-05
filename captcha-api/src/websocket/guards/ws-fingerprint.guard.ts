@@ -28,12 +28,10 @@ export class WsFingerPrintGuard implements CanActivate {
     let fingerprint = await this.fingerprintRepository.findOne({
       where: { ipAddress, userAgent },
     });
-
     // Create a new fingerprint if it doesn't exist
     if (!fingerprint) {
       fingerprint = await this.createFingerprint(ipAddress, userAgent);
     }
-
     // Check if the user already won the Flappy Bird game
     if (this.isUserAlreadyWonFlappyBird(fingerprint)) {
       this.flappyBirdGateway.server.to(client.id).emit('WON_GAME', {
@@ -42,12 +40,6 @@ export class WsFingerPrintGuard implements CanActivate {
       client.disconnect(true);
       return false;
     }
-
-    // Reset the fingerprint if it's required
-    if (this.isResetRequired(fingerprint)) {
-      await this.resetFingerprint(fingerprint);
-    }
-
     // Check if the user has too many failed attempts
     if (this.isToManyAttempt(fingerprint)) {
       this.flappyBirdGateway.server.to(client.id).emit('TOO_MANY_ATTEMPTS', {
@@ -56,6 +48,15 @@ export class WsFingerPrintGuard implements CanActivate {
       });
       client.disconnect(true);
       return false;
+    } else {
+      // Send the total failed attempts to the client
+      this.flappyBirdGateway.server
+        .to(client.id)
+        .emit('TOTAL_FAILED', fingerprint.totalFailed);
+    }
+    // Reset the fingerprint if it's required
+    if (this.isResetRequired(fingerprint)) {
+      await this.resetFingerprint(fingerprint);
     }
 
     return true;
@@ -86,8 +87,7 @@ export class WsFingerPrintGuard implements CanActivate {
     await this.fingerprintRepository.save(fingerprint);
   }
   private isToManyAttempt(fingerprint: CaptchaFingerPrint): boolean {
-    // !TODO: Change the MAX_ATTEMPTS to 10
-    const MAX_ATTEMPTS = 3;
+    const MAX_ATTEMPTS = 10;
     return fingerprint.totalFailed >= MAX_ATTEMPTS;
   }
   private isUserAlreadyWonFlappyBird(fingerprint: CaptchaFingerPrint): boolean {
