@@ -12,9 +12,10 @@ import {
   FlappyBirdService,
   UserFingerPrint,
 } from '../services/flappy-bird.service';
-import { WsFingerPrintGuard } from '../guards/ws-fingerprint.guard';
+// import { WsFingerPrintGuard } from '../guards/ws-fingerprint.guard';
 import { UseGuards } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { FlappyBirdPrintGuard } from '../guards/flappyBird.guard';
 
 interface Message {
   type: string;
@@ -23,7 +24,7 @@ interface Message {
 
 // !TODO: Add bot detection into middleware
 @WebSocketGateway({ cors: true, namespace: 'flappy-bird' })
-@UseGuards(WsFingerPrintGuard)
+@UseGuards(FlappyBirdPrintGuard)
 export class FlappyBirdGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {

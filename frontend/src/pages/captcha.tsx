@@ -1,37 +1,48 @@
-import React, { useEffect } from "react";
-import { Card, Flex, Heading, Box, Progress } from "@radix-ui/themes";
-import { useLoaderData, useNavigate, useSearchParams } from "react-router-dom";
+import React, { useEffect, useMemo } from "react";
+import { Card, Flex, Heading, Box, Progress, Badge } from "@radix-ui/themes";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import charlieImage from "../assets/charlie.png";
 import flappyBirdImage from "../assets/flappy_bird_logo.png";
 import FlappyBird from "../components/games/flappy-bird";
 import WhereIsCharlie from "../components/games/where-is-charlie";
-
-export async function loader({}: any) {
-  const totalValidatedResponse = await fetch(
-    "http://localhost:8080/captcha/validated"
-  );
-  const totalValidated = await totalValidatedResponse.json();
-  return totalValidated;
-}
+import { io, Socket } from "socket.io-client";
 
 const CaptchaPage: React.FC = () => {
   const [selectedCaptcha, setSelectedCaptcha] = React.useState<string>("");
   const [searchParams] = useSearchParams();
+  const [isFlappyBirdValidated, setIsFlappyBirdValidated] =
+    React.useState(false);
   const navigate = useNavigate();
-  const totalValidated = useLoaderData() as any;
+  const socketRef = React.useRef<Socket | null>(null);
+
+  const totalCaptchas = useMemo(() => {
+    return isFlappyBirdValidated ? 1 : 0;
+  }, [isFlappyBirdValidated]);
 
   useEffect(() => {
     const gameParam = searchParams.get("game");
-    console.log("gameParam", gameParam);
-    if (gameParam) {
+
+    if (gameParam === "flappy-bird" || gameParam === "ou-est-charlie") {
       setSelectedCaptcha(gameParam);
     } else {
+      // !TODO: Add same logic to flappy-bird.tsx
+      const newSocket = io("http://127.0.0.1:8080/finger-print");
+      socketRef.current = newSocket;
+      socketRef.current.on("FLAPPY_BIRD_VALIDATED", (message: any) => {
+        setIsFlappyBirdValidated(message.message);
+      });
+
       setSelectedCaptcha("");
+
+      return () => {
+        newSocket.disconnect();
+      };
     }
   }, [searchParams]);
 
   const handleSelect = (captcha: string) => {
     localStorage.setItem("gameFlappyStarted", "false");
+    socketRef.current?.disconnect();
     navigate(`?game=${captcha}`);
   };
 
@@ -68,21 +79,29 @@ const CaptchaPage: React.FC = () => {
           >
             <Flex justify="center" gap="var(--space-4)">
               <Box
-                onClick={() => handleSelect("flappy-bird")}
+                onClick={() =>
+                  isFlappyBirdValidated ? null : handleSelect("flappy-bird")
+                }
                 style={{
                   border: "none",
                   background: "none",
-                  cursor: "pointer",
+                  cursor: isFlappyBirdValidated ? "not-allowed" : "pointer",
                   padding: 0,
                   width: "45%",
                   position: "relative",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  transition: isFlappyBirdValidated
+                    ? "none"
+                    : "transform 0.3s ease, box-shadow 0.3s ease",
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform = "scale(1.05)")
+                  (e.currentTarget.style.transform = isFlappyBirdValidated
+                    ? "none"
+                    : "scale(1.05)")
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform = "scale(1)")
+                  (e.currentTarget.style.transform = isFlappyBirdValidated
+                    ? "none"
+                    : "scale(1)")
                 }
               >
                 <img
@@ -93,6 +112,11 @@ const CaptchaPage: React.FC = () => {
                     borderRadius: "var(--radius-3)",
                   }}
                 />
+                {isFlappyBirdValidated && (
+                  <Badge color="green" size="3" style={{ padding: "5px 25px" }}>
+                    Validé
+                  </Badge>
+                )}
               </Box>
               <Box
                 onClick={() => handleSelect("ou-est-charlie")}
@@ -128,8 +152,8 @@ const CaptchaPage: React.FC = () => {
             </Flex>
           </Card>
           <Box maxWidth="300px" style={{ width: "100%", textAlign: "center" }}>
-            <p style={{ marginTop: "var(--space-2)", fontSize: 25 }}>0/2</p>
-            <Progress value={0} max={100} />
+            <p style={{ fontSize: 25 }}>{totalCaptchas} / 2 </p>
+            <Progress value={isFlappyBirdValidated ? 50 : 0} />
           </Box>
         </Box>
       )}

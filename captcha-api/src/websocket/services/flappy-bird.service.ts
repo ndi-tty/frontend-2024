@@ -145,4 +145,23 @@ export class FlappyBirdService {
       await this.fingerprintRepository.save(fingerprint);
     }
   }
+
+  async createUserFingerprintIfNotExists(user: UserFingerPrint): Promise<any> {
+    let fingerprint = await this.fingerprintRepository.findOne({
+      where: { userAgent: user.userAgent, ipAddress: user.ipAddress },
+    });
+
+    if (!fingerprint) {
+      fingerprint = {} as CaptchaFingerPrint;
+      fingerprint.userAgent = user.userAgent;
+      fingerprint.ipAddress = user.ipAddress;
+      fingerprint.totalFailed = 0;
+      fingerprint.isFlappyBirdValidated = false;
+      fingerprint.lastAttempt = new Date();
+      const userFingerPrint =
+        await this.fingerprintRepository.save(fingerprint);
+      return userFingerPrint;
+    }
+    return fingerprint;
+  }
 }

@@ -13,6 +13,7 @@ import {
 } from "@radix-ui/themes";
 
 import flappyBirdLogo from "../../assets/flappy_bird_logo.png";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const PIPE_GAP = 150; // Increased gap for easier gameplay
 
@@ -40,6 +41,7 @@ interface CaptchaToManyAttempts {
   lastAttempt: string;
   message: string;
 }
+
 // !TODO: Supprimer localStorage lors de la navigation
 const FlappyBird: React.FC = () => {
   const [bird, setBird] = useState<Bird>({
@@ -59,18 +61,23 @@ const FlappyBird: React.FC = () => {
     null
   );
   const [timeRemaining, setTimeRemaining] = useState<string>("");
-  const [isWon, setIsWon] = useState(false);
+  // const [isWon, setIsWon] = useState(false);
   const [totalFailed, setTotalFailed] = useState(0);
   const [gameStarted, setGameStarted] = useState(
     localStorage.getItem("gameFlappyStarted") === "true"
   );
+  const [searchParams] = useSearchParams();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("[flappy-bird.tsx] : RUNNING EMIT WEBSOCKET ", gameStarted);
     socket?.emit("message", JSON.stringify({ type: "FLAP" }));
   }, [socket]);
 
   useEffect(() => {
-    if (gameStarted) {
+    if (gameStarted && searchParams.get("game") === "flappy-bird") {
+      console.log("[flappy-bird.tsx] : RUNNING WEBSOCKET ", gameStarted);
       //!TODO: Add bot detection into middleware
       const newSocket = io("http://127.0.0.1:8080/flappy-bird");
       setSocket(newSocket);
@@ -87,8 +94,8 @@ const FlappyBird: React.FC = () => {
       });
 
       newSocket.on("WON_GAME", () => {
-        setIsWon(true);
-        newSocket.close();
+        navigate("/captcha");
+        newSocket.disconnect();
       });
 
       newSocket.on("INITIAL_STATE", (initialState: GameState) => {
@@ -106,7 +113,7 @@ const FlappyBird: React.FC = () => {
       });
 
       return () => {
-        newSocket.close();
+        newSocket.disconnect();
       };
     }
   }, [gameStarted]);
@@ -143,14 +150,14 @@ const FlappyBird: React.FC = () => {
   );
 
   useEffect(() => {
-    if (gameStarted) {
+    if (gameStarted && searchParams.get("game") === "flappy-bird") {
       window.addEventListener("keydown", handleKeyPress);
       return () => window.removeEventListener("keydown", handleKeyPress);
     }
   }, [handleKeyPress, gameStarted]);
 
   useEffect(() => {
-    if (gameStarted) {
+    if (gameStarted && searchParams.get("game") === "flappy-bird") {
       const gameInterval = setInterval(() => {
         if (gameOver || !socket) {
           return;
@@ -271,10 +278,6 @@ const FlappyBird: React.FC = () => {
         </Flex>
       </Box>
     );
-  }
-
-  if (isWon) {
-    return <div>Congratulations! You won Flappy Bird!</div>;
   }
 
   return (
