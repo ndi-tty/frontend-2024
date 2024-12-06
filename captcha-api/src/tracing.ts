@@ -1,6 +1,4 @@
-import {
-  SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import * as process from 'process';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
@@ -38,4 +36,3 @@ process.on('SIGTERM', () => {
     )
     .finally(() => process.exit(0));
 });
-
