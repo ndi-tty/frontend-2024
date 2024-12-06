@@ -29,7 +29,14 @@ const router = createBrowserRouter(
       }}
       errorElement={<ErrorPage />}
     >
-      <Route index element={<Home />} />
+      <Route
+        index
+        element={<Home />}
+        loader={() => {
+          localStorage.setItem("gameFlappyStarted", "false");
+          return null;
+        }}
+      />
       <Route path="scene-1" element={<Scene1 />} />
       <Route path="scene-2" element={<Scene2 />} />
       <Route path="scene-3" element={<Scene3 />} />
