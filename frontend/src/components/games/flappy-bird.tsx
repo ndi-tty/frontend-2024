@@ -14,6 +14,7 @@ import {
 
 import flappyBirdLogo from "../../assets/flappy_bird_logo.png";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { API_BASE_URL } from "../../config";
 
 const PIPE_GAP = 150; // Increased gap for easier gameplay
 
@@ -61,7 +62,6 @@ const FlappyBird: React.FC = () => {
     null
   );
   const [timeRemaining, setTimeRemaining] = useState<string>("");
-  // const [isWon, setIsWon] = useState(false);
   const [totalFailed, setTotalFailed] = useState(0);
   const [gameStarted, setGameStarted] = useState(
     localStorage.getItem("gameFlappyStarted") === "true"
@@ -77,9 +77,8 @@ const FlappyBird: React.FC = () => {
 
   useEffect(() => {
     if (gameStarted && searchParams.get("game") === "flappy-bird") {
-      console.log("[flappy-bird.tsx] : RUNNING WEBSOCKET ", gameStarted);
       //!TODO: Add bot detection into middleware
-      const newSocket = io("http://127.0.0.1:8080/flappy-bird");
+      const newSocket = io(`${API_BASE_URL}/flappy-bird`);
       setSocket(newSocket);
 
       newSocket.on("TOTAL_FAILED", (failed: number) => {
@@ -183,8 +182,8 @@ const FlappyBird: React.FC = () => {
   }, [score]);
 
   const handleNewGame = () => {
-    localStorage.setItem("gameFlappyStarted", "true");
     window.location.reload();
+    localStorage.setItem("gameFlappyStarted", "true");
   };
 
   const handleStartGame = () => {

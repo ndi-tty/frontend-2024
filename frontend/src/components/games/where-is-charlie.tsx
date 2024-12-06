@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import "./css/where-is-charlie.modules.css";
-import win from "../assets/win.png";
-import lose from "../assets/lose.png";
-import Timer from "../components/common/timer";
-import { API_BASE_URL } from "../config";
-import { NotificationType } from "../components/common/notification";
-import { addNotification } from "../store/slices/notifications.slice";
+import "../../pages/css/where-is-charlie.modules.css";
+import win from "../../assets/win.png";
+import lose from "../../assets/lose.png";
 import { useDispatch } from "react-redux";
 import "../../pages/css/where-is-charlie.modules.css";
-import { CountdownCircleTimer } from "react-countdown-circle-timer";
-import CustomAlertDialog from "../common/customAlertDialog";
+import Timer from "../common/timer";
+import { API_BASE_URL } from "../../config";
+import CustomAlertDialog from "../common/custom-alert-dialog";
+import { NotificationType } from "../common/notification";
+import { addNotification } from "../../store/slices/notifications.slice";
 
 enum Events {
   INIT_GAME = "init-game",
@@ -182,7 +181,9 @@ const WhereIsCharlie: React.FC = () => {
               isPlaying={gameState === GameState.IN_PROGRESS}
               colors={"#445bcc"}
             />
-            <span className="attempts-left">Attempts Left: {attemptsLeft}</span>
+            <span className="attempts-left">
+              Tentatives restantes: {attemptsLeft}
+            </span>
           </div>
         )}
 
