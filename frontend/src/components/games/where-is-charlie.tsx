@@ -193,7 +193,9 @@ const WhereIsCharlie: React.FC<WhereIsCharlieProps> = ({ emitGameWon }) => {
               isPlaying={gameState === GameState.IN_PROGRESS}
               colors={"#445bcc"}
             />
-            <span className="attempts-left">Attempts Left: {attemptsLeft}</span>
+            <span className="attempts-left">
+              Tentatives restantes: {attemptsLeft}
+            </span>
           </div>
         )}
 

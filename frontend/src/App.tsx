@@ -29,13 +29,7 @@ const router = createBrowserRouter(
       }}
       errorElement={<ErrorPage />}
     >
-      <Route
-        index
-        element={<Home />}
-        loader={() => {
-          return null;
-        }}
-      />
+      <Route index element={<Home />} />
       <Route path="scene-1" element={<Scene1 />} />
       <Route path="scene-2" element={<Scene2 />} />
       <Route path="scene-3" element={<Scene3 />} />
