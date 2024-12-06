@@ -25,7 +25,6 @@ const router = createBrowserRouter(
       path="/"
       element={<RootLayout />}
       loader={() => {
-        localStorage.setItem("gameFlappyStarted", "false");
         return null;
       }}
       errorElement={<ErrorPage />}
@@ -34,7 +33,6 @@ const router = createBrowserRouter(
         index
         element={<Home />}
         loader={() => {
-          localStorage.setItem("gameFlappyStarted", "false");
           return null;
         }}
       />
@@ -49,7 +47,6 @@ const router = createBrowserRouter(
         path="about"
         element={<div>About Page</div>}
         loader={() => {
-          localStorage.setItem("gameFlappyStarted", "false");
           return null;
         }}
       />
@@ -58,7 +55,6 @@ const router = createBrowserRouter(
         path="team"
         element={<Equipe />}
         loader={() => {
-          localStorage.setItem("gameFlappyStarted", "false");
           return null;
         }}
       />
