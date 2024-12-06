@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+=======
+import {
+  SimpleSpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
+>>>>>>> 5744c21 (feat: add otpl)
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import * as process from 'process';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
