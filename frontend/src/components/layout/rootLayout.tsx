@@ -1,17 +1,17 @@
-import { gray, green, slate } from "@radix-ui/colors";
+import { gray, blue, slate } from "@radix-ui/colors";
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { Flex, Box, Heading, Text, Separator } from "@radix-ui/themes";
-import ReactLogo from "../../assets/react.svg";
+import PirateLogo from "../../assets/pirate.png";
 import NuitInfoLogo from "../../assets/nuit-info.svg";
 import { FaHeart } from "react-icons/fa";
 
 const theme = {
   backgroundColor: slate.slate12,
-  headerBackground: green.green9,
+  headerBackground: blue.blue8,
   navBackground: slate.slate11,
   color: gray.gray1,
-  linkColor: green.green5,
+  linkColor: blue.blue5,
   IconBackground: gray.gray1,
 };
 
@@ -28,7 +28,6 @@ const RootLayout: React.FC = () => {
       direction="column"
       style={{
         height: "100vh",
-        backgroundColor: theme.backgroundColor,
         overflow: "hidden",
       }}
     >
@@ -37,18 +36,21 @@ const RootLayout: React.FC = () => {
           padding: "2rem",
           backgroundColor: theme.headerBackground,
           display: "flex",
+          width: "100%",
+          zIndex: 1000,
           justifyContent: "space-between",
           alignItems: "center",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)", // Added soft shadow with fading effect
         }}
       >
         <Flex align="center">
           <img
-            src={ReactLogo}
+            src={PirateLogo}
             alt="logo"
-            style={{ width: "40px", marginRight: "10px" }}
+            style={{ width: "60px", marginRight: "10px" }}
           />
-          <Heading style={{ color: "white" }} as="h1">
-            Nuit info 2024
+          <Heading style={{ color: "white", fontSize: "3rem"}} as="h1">
+            Nuit de l'info 2024
           </Heading>
         </Flex>
       </Box>
@@ -57,7 +59,6 @@ const RootLayout: React.FC = () => {
           style={{
             width: "300px",
             padding: "1rem",
-            backgroundColor: theme.navBackground,
           }}
         >
           <ul style={{ listStyle: "none", padding: 0 }}>
@@ -108,7 +109,10 @@ const RootLayout: React.FC = () => {
           <Outlet />
         </Box>
       </Flex>
-      <Box style={{ padding: "1rem", backgroundColor: theme.headerBackground }}>
+      <Box style={{ padding: "1rem", backgroundColor: theme.headerBackground,
+          boxShadow: "0 -4px 10px rgba(0, 0, 0, 0.5)", // Added soft shadow with fading effect
+
+       }}>
         <Flex justify="between" align="center">
           <Flex align="center">
             <img

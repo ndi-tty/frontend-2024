@@ -4,28 +4,38 @@ import { Link } from "react-router-dom";
 import { IoIosSchool } from "react-icons/io";
 import { FaGithub } from "react-icons/fa";
 import { CiLinkedin } from "react-icons/ci";
+import Charley from "../assets/equipe/charley.jpeg";
+import Sylvain from "../assets/equipe/sylvanus.jpeg";
+import Martin from "../assets/equipe/martin.jpeg";
+import Thomas from "../assets/equipe/thomas.jpeg";
 
 const teamMembers = [
   {
     name: "Charley Geoffroy",
     github: "https://github.com/charley04310",
     linkedin: "https://linkedin.com/in/charley",
-  },
-  {
-    name: "Thomas Mauran",
-    github: "https://github.com/thomas-mauran",
-    linkedin:
-      "https://www.linkedin.com/in/thomas-mauran-9238371b7?originalSubdomain=fr",
+    img: Charley,
   },
   {
     name: "Sylvain Pierrot",
     github: "https://github.com/sylvain-pierrot",
     linkedin: "https://linkedin.com/in/sylvain",
+    img: Sylvain,
+
   },
   {
     name: "Martin Moreira",
     github: "https://github.com/mmoreiradj",
     linkedin: "https://linkedin.com/in/martin",
+    img: Martin,
+
+  },
+  {
+    name: "Thomas Mauran",
+    github: "https://github.com/thomas-mauran",
+    linkedin: "https://www.linkedin.com/in/thomas-mauran-9238371b7?originalSubdomain=fr",
+    img: Thomas,
+
   },
 ];
 
@@ -42,14 +52,14 @@ const Equipe: React.FC = () => {
         Nous sommes une équipe d'étudiant de Polytech Montpellier passionnés par
         le développement et les technologies web.
       </Text>
-      <Flex gap="4" wrap="wrap" direction="column">
+      <Flex gap="4" wrap="wrap" direction="row" justify="center">
         {teamMembers.map((member) => (
-          <Box key={member.name} maxWidth="550px" width="100%">
+          <Box key={member.name} maxWidth="650px" width="100%">
             <Card>
               <Flex gap="3" align="center">
                 <Avatar
                   size="9"
-                  src="https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop"
+                  src={member.img as string}
                   fallback={member.name.charAt(0)}
                   radius="small"
                 />
