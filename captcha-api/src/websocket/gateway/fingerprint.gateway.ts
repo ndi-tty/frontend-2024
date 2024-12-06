@@ -18,7 +18,6 @@ export class FingerPrintGateway
   constructor(private readonly flappyBirdService: FlappyBirdService) {}
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('[FingerPrint]: Client connected');
     const userFingerprint = {
       userAgent: client.handshake.headers['user-agent'],
       ipAddress: client.handshake.address,
@@ -29,9 +28,11 @@ export class FingerPrintGateway
         userFingerprint,
       );
 
-    console.log('[FingerPrint]: User created', user);
     client.emit('FLAPPY_BIRD_VALIDATED', {
       message: user.isFlappyBirdValidated,
+    });
+    client.emit('CHARLIE_VALIDATED', {
+      message: user.isCharlieValidated,
     });
   }
 

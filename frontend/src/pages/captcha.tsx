@@ -6,18 +6,20 @@ import flappyBirdImage from "../assets/flappy_bird_logo.png";
 import FlappyBird from "../components/games/flappy-bird";
 import WhereIsCharlie from "../components/games/where-is-charlie";
 import { io, Socket } from "socket.io-client";
+import { API_BASE_URL } from "../config";
 
 const CaptchaPage: React.FC = () => {
   const [selectedCaptcha, setSelectedCaptcha] = React.useState<string>("");
   const [searchParams] = useSearchParams();
   const [isFlappyBirdValidated, setIsFlappyBirdValidated] =
     React.useState(false);
+  const [isCharlieValidated, setIsCharlieValidated] = React.useState(false);
   const navigate = useNavigate();
   const socketRef = React.useRef<Socket | null>(null);
 
   const totalCaptchas = useMemo(() => {
-    return isFlappyBirdValidated ? 1 : 0;
-  }, [isFlappyBirdValidated]);
+    return (isFlappyBirdValidated ? 1 : 0) + (isCharlieValidated ? 1 : 0);
+  }, [isFlappyBirdValidated, isCharlieValidated]);
 
   useEffect(() => {
     const gameParam = searchParams.get("game");
@@ -26,12 +28,14 @@ const CaptchaPage: React.FC = () => {
       setSelectedCaptcha(gameParam);
     } else {
       // !TODO: Add same logic to flappy-bird.tsx
-      const newSocket = io("http://127.0.0.1:8080/finger-print");
+      const newSocket = io(`${API_BASE_URL}/finger-print`);
       socketRef.current = newSocket;
       socketRef.current.on("FLAPPY_BIRD_VALIDATED", (message: any) => {
         setIsFlappyBirdValidated(message.message);
       });
-
+      socketRef.current.on("CHARLIE_VALIDATED", (message: any) => {
+        setIsCharlieValidated(message.message);
+      });
       setSelectedCaptcha("");
 
       return () => {
@@ -68,7 +72,7 @@ const CaptchaPage: React.FC = () => {
           </p>
           <Card
             style={{
-              padding: "var(--space-5)",
+              padding: "10px",
               borderRadius: "var(--radius-4)",
               boxShadow: "var(--shadow-5)",
               backgroundColor: "white",
@@ -123,20 +127,23 @@ const CaptchaPage: React.FC = () => {
                 style={{
                   border: "none",
                   background: "none",
-                  cursor: "pointer",
-                  padding: "20px",
+                  cursor: isCharlieValidated ? "not-allowed" : "pointer",
+                  padding: 0,
                   width: "45%",
                   position: "relative",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  transition: isCharlieValidated
+                    ? "none"
+                    : "transform 0.3s ease, box-shadow 0.3s ease",
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform = "scale(1.05)")
+                  (e.currentTarget.style.transform = isCharlieValidated
+                    ? "none"
+                    : "scale(1.05)")
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform = "scale(1)")
+                  (e.currentTarget.style.transform = isCharlieValidated
+                    ? "none"
+                    : "scale(1)")
                 }
               >
                 <img
@@ -146,14 +153,22 @@ const CaptchaPage: React.FC = () => {
                     maxWidth: "100%",
                     maxHeight: "100%",
                     borderRadius: "var(--radius-3)",
+                    paddingBottom: isCharlieValidated ? "35px" : "0",
                   }}
                 />
+                {isCharlieValidated && (
+                  <Badge color="green" size="3" style={{ padding: "5px 25px" }}>
+                    Validé
+                  </Badge>
+                )}
               </Box>
             </Flex>
           </Card>
           <Box maxWidth="300px" style={{ width: "100%", textAlign: "center" }}>
             <p style={{ fontSize: 25 }}>{totalCaptchas} / 2 </p>
-            <Progress value={isFlappyBirdValidated ? 50 : 0} />
+            <Progress
+              value={totalCaptchas == 0 ? 0 : (totalCaptchas / 2) * 100}
+            />
           </Box>
         </Box>
       )}

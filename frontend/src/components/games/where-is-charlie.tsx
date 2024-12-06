@@ -10,6 +10,7 @@ import { API_BASE_URL } from "../../config";
 import CustomAlertDialog from "../common/custom-alert-dialog";
 import { NotificationType } from "../common/notification";
 import { addNotification } from "../../store/slices/notifications.slice";
+import { useNavigate } from "react-router-dom";
 
 enum Events {
   INIT_GAME = "init-game",
@@ -62,6 +63,7 @@ const WhereIsCharlie: React.FC = () => {
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null); // Track remaining attempts
   const [isWrongClick, setIsWrongClick] = useState<boolean>(false); // Flag to trigger animation
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     ws.current = io(`${API_BASE_URL}/where-is-charlie`);
@@ -77,6 +79,14 @@ const WhereIsCharlie: React.FC = () => {
       wsCurrent.close();
     };
   }, []);
+
+  useEffect(() => {
+    if (gameState === GameState.WON) {
+      setInterval(() => {
+        navigate("/captcha");
+      }, 3000);
+    }
+  }, [gameState]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
     if (!imageRef.current) return;
@@ -181,9 +191,6 @@ const WhereIsCharlie: React.FC = () => {
               isPlaying={gameState === GameState.IN_PROGRESS}
               colors={"#445bcc"}
             />
-            <span className="attempts-left">
-              Tentatives restantes: {attemptsLeft}
-            </span>
           </div>
         )}
 
