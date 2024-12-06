@@ -36,7 +36,3 @@ process.on('SIGTERM', () => {
     )
     .finally(() => process.exit(0));
 });
-<<<<<<< HEAD
-=======
-
->>>>>>> 5744c21 (feat: add otpl)
