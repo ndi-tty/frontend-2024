@@ -10,7 +10,6 @@ import { API_BASE_URL } from "../../config";
 import CustomAlertDialog from "../common/custom-alert-dialog";
 import { NotificationType } from "../common/notification";
 import { addNotification } from "../../store/slices/notifications.slice";
-import { useNavigate } from "react-router-dom";
 
 enum Events {
   INIT_GAME = "init-game",
@@ -49,7 +48,11 @@ interface Coordonates {
   y: number;
 }
 
-const WhereIsCharlie: React.FC = () => {
+interface WhereIsCharlieProps {
+  emitGameWon: (data: boolean) => void;
+}
+
+const WhereIsCharlie: React.FC<WhereIsCharlieProps> = ({ emitGameWon }) => {
   const ws = useRef<Socket | null>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [image, setImage] = useState<string | null>(null);
@@ -63,7 +66,6 @@ const WhereIsCharlie: React.FC = () => {
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null); // Track remaining attempts
   const [isWrongClick, setIsWrongClick] = useState<boolean>(false); // Flag to trigger animation
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     ws.current = io(`${API_BASE_URL}/where-is-charlie`);
@@ -83,8 +85,8 @@ const WhereIsCharlie: React.FC = () => {
   useEffect(() => {
     if (gameState === GameState.WON) {
       setInterval(() => {
-        navigate("/captcha");
-      }, 3000);
+        emitGameWon(true);
+      }, 1000);
     }
   }, [gameState]);
 
@@ -191,6 +193,7 @@ const WhereIsCharlie: React.FC = () => {
               isPlaying={gameState === GameState.IN_PROGRESS}
               colors={"#445bcc"}
             />
+            <span className="attempts-left">Attempts Left: {attemptsLeft}</span>
           </div>
         )}
 

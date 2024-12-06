@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { io, Socket } from "socket.io-client";
 import "../../pages/css/flappy-bird.modules.css";
 import gameOverLogo from "../../assets/game_over_2.png";
@@ -13,7 +13,6 @@ import {
 } from "@radix-ui/themes";
 
 import flappyBirdLogo from "../../assets/flappy_bird_logo.png";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../../config";
 
 const PIPE_GAP = 150; // Increased gap for easier gameplay
@@ -43,8 +42,12 @@ interface CaptchaToManyAttempts {
   message: string;
 }
 
+interface FlappyBirdProps {
+  emitGameWon: (data: boolean) => void;
+}
+
 // !TODO: Supprimer localStorage lors de la navigation
-const FlappyBird: React.FC = () => {
+const FlappyBird: React.FC<FlappyBirdProps> = ({ emitGameWon }) => {
   const [bird, setBird] = useState<Bird>({
     x: 50,
     y: 300,
@@ -66,9 +69,6 @@ const FlappyBird: React.FC = () => {
   const [gameStarted, setGameStarted] = useState(
     localStorage.getItem("gameFlappyStarted") === "true"
   );
-  const [searchParams] = useSearchParams();
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("[flappy-bird.tsx] : RUNNING EMIT WEBSOCKET ", gameStarted);
@@ -76,7 +76,7 @@ const FlappyBird: React.FC = () => {
   }, [socket]);
 
   useEffect(() => {
-    if (gameStarted && searchParams.get("game") === "flappy-bird") {
+    if (gameStarted) {
       //!TODO: Add bot detection into middleware
       const newSocket = io(`${API_BASE_URL}/flappy-bird`);
       setSocket(newSocket);
@@ -93,8 +93,9 @@ const FlappyBird: React.FC = () => {
       });
 
       newSocket.on("WON_GAME", () => {
-        navigate("/captcha");
-        newSocket.disconnect();
+        setInterval(() => {
+          emitGameWon(true);
+        }, 1000);
       });
 
       newSocket.on("INITIAL_STATE", (initialState: GameState) => {
@@ -149,14 +150,14 @@ const FlappyBird: React.FC = () => {
   );
 
   useEffect(() => {
-    if (gameStarted && searchParams.get("game") === "flappy-bird") {
+    if (gameStarted) {
       window.addEventListener("keydown", handleKeyPress);
       return () => window.removeEventListener("keydown", handleKeyPress);
     }
   }, [handleKeyPress, gameStarted]);
 
   useEffect(() => {
-    if (gameStarted && searchParams.get("game") === "flappy-bird") {
+    if (gameStarted) {
       const gameInterval = setInterval(() => {
         if (gameOver || !socket) {
           return;
