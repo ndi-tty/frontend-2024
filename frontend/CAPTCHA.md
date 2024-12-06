@@ -6,8 +6,12 @@ Avant de commencer à lire ce document, nous vous recommandons de consulter la d
 **Accéder au site web** :
 [Visitez le site web CAPTCHA](https://ndi-tty.moreiradj.net/captcha)
 
-**Vidéo (démo) et Documentation**: 
-[Consultez la vidéo et la documentation Markdown](https://ndi-tty.moreiradj.net/captcha)
+**Documentation GITHUB (Markdown)**: 
+[La documentation Markdown](https://github.com/ndi-tty/ndi-2024-rendu/blob/main/frontend/CAPTCHA.md)
+
+**Vidéo de présentation** :
+[Regardez la vidéo de présentation](https://www.youtube.com/watch?v=VM0f2FSM4v8)
+
 
 ## Table des matières
 
@@ -179,6 +183,7 @@ Une connexion **websocket** est établie entre le client et le serveur.
         - Renvoi d’un nouveau challenge ou blocage selon le nombre d’échecs.
 
 - Echecs et tentatives en base de données :
+
 ![image](../doc/img/total_failed.png)
 
 #### Étape 5: Accès à la ressource
