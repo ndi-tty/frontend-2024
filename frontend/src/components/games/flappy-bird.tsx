@@ -59,7 +59,7 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ emitGameWon }) => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [isBot, setIsBot] = useState(false);
+  const [isBot] = useState(false);
   const [isToManyAttempts, setIsToManyAttempts] = useState(false);
   const [nextAvailableAttempt, setNextAvailableAttempt] = useState<Date | null>(
     null
