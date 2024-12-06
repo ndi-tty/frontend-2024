@@ -43,8 +43,6 @@ const CaptchaPage: React.FC = () => {
     } else {
       setIsCharlieValidated(bool);
     }
-    console.log("emitting", game, bool);
-    
     setSelectedCaptcha(null);
   };
 

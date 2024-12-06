@@ -93,9 +93,7 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ emitGameWon }) => {
       });
 
       newSocket.on("WON_GAME", () => {
-        setInterval(() => {
-          emitGameWon(true);
-        }, 1000);
+        emitGameWon(true);
       });
 
       newSocket.on("INITIAL_STATE", (initialState: GameState) => {
