@@ -83,12 +83,13 @@ const WhereIsCharlie: React.FC<WhereIsCharlieProps> = ({ emitGameWon }) => {
   }, []);
 
   useEffect(() => {
-    if (gameState === GameState.WON) {
-      setInterval(() => {
-        emitGameWon(true);
-      }, 1000);
-    }
-  }, [gameState]);
+    if (gameState !== GameState.WON) return;
+
+    emitGameWon(true)
+
+    console.log("Game won!");
+    
+  }, [gameState, emitGameWon]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
     if (!imageRef.current) return;
