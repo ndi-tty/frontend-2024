@@ -23,3 +23,6 @@ database:
 image:
   pullPolicy: Always
   tag: latest
+
+monitoring:
+  jaegerEndpoint: http://tempo.monitoring.svc.cluster.local:14268/api/traces

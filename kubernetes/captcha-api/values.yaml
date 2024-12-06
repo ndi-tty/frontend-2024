@@ -5,6 +5,9 @@
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
+monitoring:
+  jaegerEndpoint: http://jaeger:14268/api/traces
+
 database:
   secretName: postgres
   host: postgres
@@ -79,17 +82,17 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources:
+resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  limits:
-    cpu: 1000m
-    memory: 256Mi
-  requests:
-    cpu: 1000m
-    memory: 256Mi
+  # limits:
+  #   cpu: 1000m
+  #   memory: 256Mi
+  # requests:
+  #   cpu: 1000m
+  #   memory: 256Mi
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:

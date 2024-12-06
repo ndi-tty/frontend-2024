@@ -3,8 +3,10 @@ import { MainModule } from './main.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { Logger } from 'nestjs-pino';
+import { otelSDK } from './tracing';
 
 async function bootstrap() {
+  await otelSDK.start();
   const app = await NestFactory.create(MainModule, {
     bufferLogs: true,
   });

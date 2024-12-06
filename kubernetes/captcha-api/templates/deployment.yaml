@@ -37,6 +37,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: JAEGER_ENDPOINT
+              value: {{ .Values.monitoring.jaegerEndpoint }}
             - name: DATABASE_HOST
               value: {{ .Values.database.host }}
             - name: DATABASE_USERNAME
