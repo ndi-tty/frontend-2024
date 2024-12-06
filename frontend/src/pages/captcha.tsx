@@ -123,7 +123,9 @@ const CaptchaPage: React.FC = () => {
                 )}
               </Box>
               <Box
-                onClick={() => handleSelect("ou-est-charlie")}
+                onClick={() =>
+                  isCharlieValidated ? null : handleSelect("ou-est-charlie")
+                }
                 style={{
                   border: "none",
                   background: "none",
